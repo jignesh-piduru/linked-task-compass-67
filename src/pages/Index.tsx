@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Plus, Filter } from 'lucide-react';
 import TaskCard from '@/components/TaskCard';
 import TaskForm from '@/components/TaskForm';
@@ -32,15 +33,42 @@ const Index = () => {
     setTasks(tasks.filter(task => task.id !== taskId));
   };
 
-  const filteredTasks = tasks.filter(task => {
-    const matchesCategory = filterCategory === 'all' || task.category === filterCategory;
-    const matchesSearch = task.taskName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         task.employeeName.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesCategory && matchesSearch;
-  });
+  const today = new Date().toISOString().split('T')[0];
+
+  const getFilteredTasks = (tabFilter: string) => {
+    let filteredByTab = tasks;
+
+    switch (tabFilter) {
+      case 'today':
+        filteredByTab = tasks.filter(task => task.startDate === today);
+        break;
+      case 'pending':
+        filteredByTab = tasks.filter(task => !task.actualEndDate);
+        break;
+      case 'completed':
+        filteredByTab = tasks.filter(task => !!task.actualEndDate);
+        break;
+      case 'future':
+        filteredByTab = tasks.filter(task => task.startDate > today);
+        break;
+      case 'all':
+      default:
+        filteredByTab = tasks;
+        break;
+    }
+
+    return filteredByTab.filter(task => {
+      const matchesCategory = filterCategory === 'all' || task.category === filterCategory;
+      const matchesSearch = task.taskName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           task.employeeName.toLowerCase().includes(searchTerm.toLowerCase());
+      return matchesCategory && matchesSearch;
+    });
+  };
 
   const completedTasks = tasks.filter(task => task.actualEndDate).length;
   const inProgressTasks = tasks.filter(task => !task.actualEndDate).length;
+  const todayTasks = tasks.filter(task => task.startDate === today).length;
+  const futureTasks = tasks.filter(task => task.startDate > today).length;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
@@ -63,18 +91,22 @@ const Index = () => {
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-8">
             <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl p-6 text-white">
               <h3 className="text-lg font-semibold">Total Tasks</h3>
               <p className="text-3xl font-bold mt-2">{tasks.length}</p>
+            </div>
+            <div className="bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl p-6 text-white">
+              <h3 className="text-lg font-semibold">Today's Tasks</h3>
+              <p className="text-3xl font-bold mt-2">{todayTasks}</p>
             </div>
             <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-xl p-6 text-white">
               <h3 className="text-lg font-semibold">Completed</h3>
               <p className="text-3xl font-bold mt-2">{completedTasks}</p>
             </div>
             <div className="bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl p-6 text-white">
-              <h3 className="text-lg font-semibold">In Progress</h3>
-              <p className="text-3xl font-bold mt-2">{inProgressTasks}</p>
+              <h3 className="text-lg font-semibold">Future Tasks</h3>
+              <p className="text-3xl font-bold mt-2">{futureTasks}</p>
             </div>
           </div>
         </div>
@@ -104,40 +136,64 @@ const Index = () => {
         </div>
       </div>
 
-      {/* Tasks Grid */}
+      {/* Tabbed Task Views */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
-        {filteredTasks.length === 0 ? (
-          <div className="text-center py-12">
-            <div className="bg-white rounded-2xl p-8 shadow-sm border border-slate-200">
-              <h3 className="text-xl font-semibold text-slate-900 mb-2">No tasks found</h3>
-              <p className="text-slate-600 mb-6">
-                {tasks.length === 0 
-                  ? "Get started by creating your first task!" 
-                  : "Try adjusting your filters or search terms."}
-              </p>
-              {tasks.length === 0 && (
-                <Button 
-                  onClick={() => setIsFormOpen(true)}
-                  className="bg-blue-600 hover:bg-blue-700"
-                >
-                  <Plus className="mr-2 h-4 w-4" />
-                  Create First Task
-                </Button>
-              )}
-            </div>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredTasks.map((task) => (
-              <TaskCard
-                key={task.id}
-                task={task}
-                onUpdate={updateTask}
-                onDelete={deleteTask}
-              />
-            ))}
-          </div>
-        )}
+        <Tabs defaultValue="today" className="w-full">
+          <TabsList className="grid w-full grid-cols-5 mb-6">
+            <TabsTrigger value="today">Today</TabsTrigger>
+            <TabsTrigger value="all">All Tasks</TabsTrigger>
+            <TabsTrigger value="pending">Pending</TabsTrigger>
+            <TabsTrigger value="completed">Completed</TabsTrigger>
+            <TabsTrigger value="future">Future</TabsTrigger>
+          </TabsList>
+
+          {['today', 'all', 'pending', 'completed', 'future'].map((tabValue) => (
+            <TabsContent key={tabValue} value={tabValue}>
+              {(() => {
+                const filteredTasks = getFilteredTasks(tabValue);
+                
+                if (filteredTasks.length === 0) {
+                  return (
+                    <div className="text-center py-12">
+                      <div className="bg-white rounded-2xl p-8 shadow-sm border border-slate-200">
+                        <h3 className="text-xl font-semibold text-slate-900 mb-2">
+                          No {tabValue === 'all' ? '' : tabValue} tasks found
+                        </h3>
+                        <p className="text-slate-600 mb-6">
+                          {tasks.length === 0 
+                            ? "Get started by creating your first task!" 
+                            : `Try adjusting your filters or search terms to find ${tabValue} tasks.`}
+                        </p>
+                        {tasks.length === 0 && (
+                          <Button 
+                            onClick={() => setIsFormOpen(true)}
+                            className="bg-blue-600 hover:bg-blue-700"
+                          >
+                            <Plus className="mr-2 h-4 w-4" />
+                            Create First Task
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  );
+                }
+
+                return (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {filteredTasks.map((task) => (
+                      <TaskCard
+                        key={task.id}
+                        task={task}
+                        onUpdate={updateTask}
+                        onDelete={deleteTask}
+                      />
+                    ))}
+                  </div>
+                );
+              })()}
+            </TabsContent>
+          ))}
+        </Tabs>
       </div>
 
       {/* Task Form Modal */}
