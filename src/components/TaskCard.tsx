@@ -5,15 +5,17 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Calendar, User, Link, Edit, Trash2, CheckCircle, Clock } from 'lucide-react';
 import { Task } from '@/types/Task';
+import { Employee } from '@/types/Employee';
 import TaskForm from './TaskForm';
 
 interface TaskCardProps {
   task: Task;
+  employees: Employee[];
   onUpdate: (task: Task) => void;
   onDelete: (taskId: string) => void;
 }
 
-const TaskCard = ({ task, onUpdate, onDelete }: TaskCardProps) => {
+const TaskCard = ({ task, employees, onUpdate, onDelete }: TaskCardProps) => {
   const [isEditing, setIsEditing] = useState(false);
 
   const isOverdue = !task.actualEndDate && new Date(task.estimatedEndDate) < new Date();
@@ -148,6 +150,7 @@ const TaskCard = ({ task, onUpdate, onDelete }: TaskCardProps) => {
       {isEditing && (
         <TaskForm
           task={task}
+          employees={employees}
           onSubmit={handleUpdate}
           onClose={() => setIsEditing(false)}
         />

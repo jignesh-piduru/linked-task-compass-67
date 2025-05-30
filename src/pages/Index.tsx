@@ -1,3 +1,4 @@
+
 import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -302,7 +303,7 @@ const Index = () => {
     return new Date(dateString).toLocaleDateString();
   };
 
-  const getStatusBadge = (status?: string) => {
+  const getEmployeeStatusBadge = (status?: string) => {
     const statusColors = {
       active: 'bg-green-100 text-green-800',
       inactive: 'bg-red-100 text-red-800', 
@@ -322,7 +323,7 @@ const Index = () => {
     return <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${colorClass}`}>{role || 'Employee'}</span>;
   };
 
-  const getStatusBadge = (task: Task) => {
+  const getTaskStatusBadge = (task: Task) => {
     if (task.actualEndDate) {
       return <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">Completed</span>;
     }
@@ -623,7 +624,7 @@ const Index = () => {
                                   </div>
                                 </TableCell>
                                 <TableCell>{getCategoryBadge(task.category)}</TableCell>
-                                <TableCell>{getStatusBadge(task)}</TableCell>
+                                <TableCell>{getTaskStatusBadge(task)}</TableCell>
                                 <TableCell>{formatDate(task.startDate)}</TableCell>
                                 <TableCell>{formatDate(task.estimatedEndDate)}</TableCell>
                                 <TableCell>{task.actualEndDate ? formatDate(task.actualEndDate) : '-'}</TableCell>
@@ -851,7 +852,7 @@ const Index = () => {
                             </span>
                           </TableCell>
                           <TableCell>{employee.position}</TableCell>
-                          <TableCell>{getStatusBadge(employee.status)}</TableCell>
+                          <TableCell>{getEmployeeStatusBadge(employee.status)}</TableCell>
                           <TableCell>{getRoleBadge(employee.role)}</TableCell>
                           <TableCell>
                             {employee.premiumAccess ? (
