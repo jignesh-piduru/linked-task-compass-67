@@ -1,16 +1,19 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
-import { Plus, Filter, Edit, Trash2, ExternalLink, Users } from 'lucide-react';
+import { Plus, Filter, Edit, Trash2, ExternalLink, Users, Download, Upload } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { useToast } from '@/hooks/use-toast';
 import TaskForm from '@/components/TaskForm';
 import EmployeeForm from '@/components/EmployeeForm';
 import { Task } from '@/types/Task';
 import { Employee } from '@/types/Employee';
+import { exportToCSV, handleFileImport, validateEmployeeData, validateTaskData } from '@/utils/csvUtils';
 
-// Sample employees data
+// Sample employees data with new fields
 const getSampleEmployees = (): Employee[] => {
   return [
     {
@@ -19,7 +22,10 @@ const getSampleEmployees = (): Employee[] => {
       email: 'sarah.johnson@company.com',
       department: 'Engineering',
       position: 'Senior Developer',
-      createdDate: '2024-01-15'
+      createdDate: '2024-01-15',
+      status: 'active',
+      role: 'manager',
+      premiumAccess: true
     },
     {
       id: '2',
@@ -27,7 +33,10 @@ const getSampleEmployees = (): Employee[] => {
       email: 'mike.chen@company.com',
       department: 'Engineering',
       position: 'Backend Developer',
-      createdDate: '2024-02-01'
+      createdDate: '2024-02-01',
+      status: 'active',
+      role: 'employee',
+      premiumAccess: false
     },
     {
       id: '3',
@@ -35,7 +44,10 @@ const getSampleEmployees = (): Employee[] => {
       email: 'emily.rodriguez@company.com',
       department: 'Design',
       position: 'UI/UX Designer',
-      createdDate: '2024-01-20'
+      createdDate: '2024-01-20',
+      status: 'active',
+      role: 'employee',
+      premiumAccess: true
     },
     {
       id: '4',
@@ -43,7 +55,10 @@ const getSampleEmployees = (): Employee[] => {
       email: 'david.park@company.com',
       department: 'Engineering',
       position: 'Data Scientist',
-      createdDate: '2024-03-01'
+      createdDate: '2024-03-01',
+      status: 'on-leave',
+      role: 'employee',
+      premiumAccess: false
     },
     {
       id: '5',
@@ -51,7 +66,10 @@ const getSampleEmployees = (): Employee[] => {
       email: 'lisa.wang@company.com',
       department: 'Engineering',
       position: 'Frontend Developer',
-      createdDate: '2024-02-15'
+      createdDate: '2024-02-15',
+      status: 'active',
+      role: 'employee',
+      premiumAccess: true
     },
     {
       id: '6',
@@ -59,7 +77,10 @@ const getSampleEmployees = (): Employee[] => {
       email: 'alex.thompson@company.com',
       department: 'Engineering',
       position: 'Security Engineer',
-      createdDate: '2024-03-10'
+      createdDate: '2024-03-10',
+      status: 'inactive',
+      role: 'admin',
+      premiumAccess: true
     }
   ];
 };
@@ -151,6 +172,11 @@ const getSampleTasks = (): Task[] => {
 };
 
 const Index = () => {
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const taskFileInputRef = useRef<HTMLInputElement>(null);
+  const employeeFileInputRef = useRef<HTMLInputElement>(null);
+  
   const [tasks, setTasks] = useState<Task[]>(getSampleTasks());
   const [employees, setEmployees] = useState<Employee[]>(getSampleEmployees());
   const [isTaskFormOpen, setIsTaskFormOpen] = useState(false);
@@ -163,6 +189,11 @@ const Index = () => {
   const [employeeCurrentPage, setEmployeeCurrentPage] = useState(1);
   const [itemsPerPage] = useState(5);
   const [activeTab, setActiveTab] = useState('tasks');
+  
+  // Employee filters
+  const [employeeStatusFilter, setEmployeeStatusFilter] = useState<'all' | 'active' | 'inactive' | 'on-leave'>('all');
+  const [employeeRoleFilter, setEmployeeRoleFilter] = useState<'all' | 'admin' | 'manager' | 'employee'>('all');
+  const [employeeDepartmentFilter, setEmployeeDepartmentFilter] = useState<'all' | 'Engineering' | 'Design' | 'Marketing' | 'Sales' | 'HR' | 'Finance'>('all');
 
   const addTask = (newTask: Omit<Task, 'id'>) => {
     const task: Task = {
@@ -237,11 +268,18 @@ const Index = () => {
   };
 
   const getFilteredEmployees = () => {
-    return employees.filter(employee => 
-      employee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      employee.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      employee.department.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    return employees.filter(employee => {
+      const matchesSearch = employee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           employee.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           employee.department.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           employee.position.toLowerCase().includes(searchTerm.toLowerCase());
+      
+      const matchesStatus = employeeStatusFilter === 'all' || employee.status === employeeStatusFilter;
+      const matchesRole = employeeRoleFilter === 'all' || employee.role === employeeRoleFilter;
+      const matchesDepartment = employeeDepartmentFilter === 'all' || employee.department === employeeDepartmentFilter;
+      
+      return matchesSearch && matchesStatus && matchesRole && matchesDepartment;
+    });
   };
 
   const getPaginatedTasks = (filteredTasks: Task[]) => {
@@ -264,6 +302,26 @@ const Index = () => {
     return new Date(dateString).toLocaleDateString();
   };
 
+  const getStatusBadge = (status?: string) => {
+    const statusColors = {
+      active: 'bg-green-100 text-green-800',
+      inactive: 'bg-red-100 text-red-800', 
+      'on-leave': 'bg-yellow-100 text-yellow-800'
+    };
+    const colorClass = statusColors[status as keyof typeof statusColors] || 'bg-gray-100 text-gray-800';
+    return <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${colorClass}`}>{status || 'Unknown'}</span>;
+  };
+
+  const getRoleBadge = (role?: string) => {
+    const roleColors = {
+      admin: 'bg-purple-100 text-purple-800',
+      manager: 'bg-blue-100 text-blue-800',
+      employee: 'bg-gray-100 text-gray-800'
+    };
+    const colorClass = roleColors[role as keyof typeof roleColors] || 'bg-gray-100 text-gray-800';
+    return <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${colorClass}`}>{role || 'Employee'}</span>;
+  };
+
   const getStatusBadge = (task: Task) => {
     if (task.actualEndDate) {
       return <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">Completed</span>;
@@ -284,8 +342,107 @@ const Index = () => {
   const todayTasks = tasks.filter(task => task.startDate === today).length;
   const futureTasks = tasks.filter(task => task.startDate > today).length;
 
+  const handleUserNameClick = (employee: Employee) => {
+    const userSlug = employee.name.toLowerCase().replace(/\s+/g, '-');
+    navigate(`/user/${userSlug}`, { state: { employee, employees, tasks } });
+  };
+
+  const handleTaskExport = () => {
+    const exportData = tasks.map(task => ({
+      ...task,
+      toolLinks: task.toolLinks.map(link => `${link.name}: ${link.url}`).join('; ')
+    }));
+    exportToCSV(exportData, 'tasks.csv');
+    toast({
+      title: "Export Successful",
+      description: "Tasks have been exported to CSV file."
+    });
+  };
+
+  const handleEmployeeExport = () => {
+    exportToCSV(employees, 'employees.csv');
+    toast({
+      title: "Export Successful", 
+      description: "Employees have been exported to CSV file."
+    });
+  };
+
+  const handleTaskImport = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    handleFileImport(
+      file,
+      (data) => {
+        const validatedTasks = validateTaskData(data);
+        setTasks(prev => [...prev, ...validatedTasks]);
+        toast({
+          title: "Import Successful",
+          description: `${validatedTasks.length} tasks have been imported.`
+        });
+      },
+      (error) => {
+        toast({
+          title: "Import Failed",
+          description: error,
+          variant: "destructive"
+        });
+      }
+    );
+    
+    // Reset file input
+    if (taskFileInputRef.current) {
+      taskFileInputRef.current.value = '';
+    }
+  };
+
+  const handleEmployeeImport = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    handleFileImport(
+      file,
+      (data) => {
+        const validatedEmployees = validateEmployeeData(data);
+        setEmployees(prev => [...prev, ...validatedEmployees]);
+        toast({
+          title: "Import Successful",
+          description: `${validatedEmployees.length} employees have been imported.`
+        });
+      },
+      (error) => {
+        toast({
+          title: "Import Failed",
+          description: error,
+          variant: "destructive"
+        });
+      }
+    );
+    
+    // Reset file input
+    if (employeeFileInputRef.current) {
+      employeeFileInputRef.current.value = '';
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+      {/* Hidden file inputs */}
+      <input
+        type="file"
+        ref={taskFileInputRef}
+        onChange={handleTaskImport}
+        accept=".csv"
+        style={{ display: 'none' }}
+      />
+      <input
+        type="file"
+        ref={employeeFileInputRef}
+        onChange={handleEmployeeImport}
+        accept=".csv"
+        style={{ display: 'none' }}
+      />
+
       {/* Header */}
       <div className="bg-white border-b border-slate-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -346,7 +503,7 @@ const Index = () => {
 
           {/* Tasks Tab */}
           <TabsContent value="tasks">
-            {/* Filters */}
+            {/* Filters and Import/Export */}
             <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between mb-6">
               <div className="flex items-center gap-2">
                 <Filter className="h-5 w-5 text-slate-500" />
@@ -360,12 +517,32 @@ const Index = () => {
                   <option value="R&D">R&D</option>
                 </select>
               </div>
-              <Input
-                placeholder="Search tasks or employees..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="max-w-sm"
-              />
+              <div className="flex items-center gap-4">
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => taskFileInputRef.current?.click()}
+                  >
+                    <Upload className="mr-2 h-4 w-4" />
+                    Import CSV
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleTaskExport}
+                  >
+                    <Download className="mr-2 h-4 w-4" />
+                    Export CSV
+                  </Button>
+                </div>
+                <Input
+                  placeholder="Search tasks or employees..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="max-w-sm"
+                />
+              </div>
             </div>
 
             {/* Task Tabs */}
@@ -535,7 +712,66 @@ const Index = () => {
 
           {/* Employees Tab */}
           <TabsContent value="employees">
-            <div className="flex justify-between items-center mb-6">
+            {/* Employee Filters and Import/Export */}
+            <div className="flex flex-col gap-4 mb-6">
+              <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+                <div className="flex flex-wrap items-center gap-2">
+                  <Filter className="h-5 w-5 text-slate-500" />
+                  <select
+                    value={employeeStatusFilter}
+                    onChange={(e) => setEmployeeStatusFilter(e.target.value as any)}
+                    className="border border-slate-300 rounded-lg px-3 py-2 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    <option value="all">All Status</option>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                    <option value="on-leave">On Leave</option>
+                  </select>
+                  <select
+                    value={employeeRoleFilter}
+                    onChange={(e) => setEmployeeRoleFilter(e.target.value as any)}
+                    className="border border-slate-300 rounded-lg px-3 py-2 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    <option value="all">All Roles</option>
+                    <option value="admin">Admin</option>
+                    <option value="manager">Manager</option>
+                    <option value="employee">Employee</option>
+                  </select>
+                  <select
+                    value={employeeDepartmentFilter}
+                    onChange={(e) => setEmployeeDepartmentFilter(e.target.value as any)}
+                    className="border border-slate-300 rounded-lg px-3 py-2 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    <option value="all">All Departments</option>
+                    <option value="Engineering">Engineering</option>
+                    <option value="Design">Design</option>
+                    <option value="Marketing">Marketing</option>
+                    <option value="Sales">Sales</option>
+                    <option value="HR">HR</option>
+                    <option value="Finance">Finance</option>
+                  </select>
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => employeeFileInputRef.current?.click()}
+                    >
+                      <Upload className="mr-2 h-4 w-4" />
+                      Import CSV
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleEmployeeExport}
+                    >
+                      <Download className="mr-2 h-4 w-4" />
+                      Export CSV
+                    </Button>
+                  </div>
+                </div>
+              </div>
               <Input
                 placeholder="Search employees..."
                 value={searchTerm}
@@ -590,6 +826,9 @@ const Index = () => {
                         <TableHead>Email</TableHead>
                         <TableHead>Department</TableHead>
                         <TableHead>Position</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Role</TableHead>
+                        <TableHead>Premium</TableHead>
                         <TableHead>Created Date</TableHead>
                         <TableHead>Actions</TableHead>
                       </TableRow>
@@ -597,7 +836,14 @@ const Index = () => {
                     <TableBody>
                       {paginatedEmployees.map((employee) => (
                         <TableRow key={employee.id}>
-                          <TableCell className="font-medium">{employee.name}</TableCell>
+                          <TableCell className="font-medium">
+                            <button
+                              onClick={() => handleUserNameClick(employee)}
+                              className="text-blue-600 hover:text-blue-800 hover:underline font-medium"
+                            >
+                              {employee.name}
+                            </button>
+                          </TableCell>
                           <TableCell>{employee.email}</TableCell>
                           <TableCell>
                             <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
@@ -605,6 +851,19 @@ const Index = () => {
                             </span>
                           </TableCell>
                           <TableCell>{employee.position}</TableCell>
+                          <TableCell>{getStatusBadge(employee.status)}</TableCell>
+                          <TableCell>{getRoleBadge(employee.role)}</TableCell>
+                          <TableCell>
+                            {employee.premiumAccess ? (
+                              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                Premium
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                Standard
+                              </span>
+                            )}
+                          </TableCell>
                           <TableCell>{formatDate(employee.createdDate)}</TableCell>
                           <TableCell>
                             <div className="flex gap-2">

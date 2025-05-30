@@ -6,4 +6,7 @@ export interface Employee {
   department: string;
   position: string;
   createdDate: string;
+  status?: 'active' | 'inactive' | 'on-leave';
+  role?: 'admin' | 'manager' | 'employee';
+  premiumAccess?: boolean;
 }

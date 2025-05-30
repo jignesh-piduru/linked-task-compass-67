@@ -20,7 +20,10 @@ const EmployeeForm = ({ employee, onSubmit, onClose }: EmployeeFormProps) => {
     email: employee?.email || '',
     department: employee?.department || 'Engineering',
     position: employee?.position || '',
-    createdDate: employee?.createdDate || new Date().toISOString().split('T')[0]
+    createdDate: employee?.createdDate || new Date().toISOString().split('T')[0],
+    status: employee?.status || 'active',
+    role: employee?.role || 'employee',
+    premiumAccess: employee?.premiumAccess || false
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -28,7 +31,7 @@ const EmployeeForm = ({ employee, onSubmit, onClose }: EmployeeFormProps) => {
     onSubmit(formData);
   };
 
-  const handleInputChange = (field: string, value: string) => {
+  const handleInputChange = (field: string, value: string | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
@@ -100,6 +103,50 @@ const EmployeeForm = ({ employee, onSubmit, onClose }: EmployeeFormProps) => {
                 required
                 placeholder="Enter job position"
               />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="status">Status</Label>
+              <Select value={formData.status} onValueChange={(value) => handleInputChange('status', value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="active">Active</SelectItem>
+                  <SelectItem value="inactive">Inactive</SelectItem>
+                  <SelectItem value="on-leave">On Leave</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="role">Role</Label>
+              <Select value={formData.role} onValueChange={(value) => handleInputChange('role', value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select role" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="admin">Admin</SelectItem>
+                  <SelectItem value="manager">Manager</SelectItem>
+                  <SelectItem value="employee">Employee</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="premiumAccess">Premium Access</Label>
+              <Select 
+                value={formData.premiumAccess.toString()} 
+                onValueChange={(value) => handleInputChange('premiumAccess', value === 'true')}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select premium access" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="true">Yes</SelectItem>
+                  <SelectItem value="false">No</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="space-y-2">
