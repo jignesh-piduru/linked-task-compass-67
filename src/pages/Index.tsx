@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,8 +7,94 @@ import TaskCard from '@/components/TaskCard';
 import TaskForm from '@/components/TaskForm';
 import { Task } from '@/types/Task';
 
+// Sample data to demonstrate all functionality
+const getSampleTasks = (): Task[] => {
+  const today = new Date().toISOString().split('T')[0];
+  const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+  const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+  const nextWeek = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+
+  return [
+    {
+      id: '1',
+      employeeName: 'Sarah Johnson',
+      taskName: 'User Authentication System',
+      category: 'Product',
+      description: 'Implement secure login and registration functionality with JWT tokens and password reset capabilities.',
+      startDate: today,
+      estimatedEndDate: tomorrow,
+      toolLinks: [
+        { id: '1', name: 'GitHub Repo', url: 'https://github.com/company/auth-system' },
+        { id: '2', name: 'Design Mockups', url: 'https://figma.com/auth-designs' }
+      ]
+    },
+    {
+      id: '2',
+      employeeName: 'Mike Chen',
+      taskName: 'API Performance Optimization',
+      category: 'R&D',
+      description: 'Research and implement database query optimizations to reduce API response times by 50%.',
+      startDate: yesterday,
+      estimatedEndDate: today,
+      actualEndDate: today,
+      toolLinks: [
+        { id: '3', name: 'Performance Docs', url: 'https://docs.company.com/performance' },
+        { id: '4', name: 'Monitoring Dashboard', url: 'https://grafana.company.com' }
+      ]
+    },
+    {
+      id: '3',
+      employeeName: 'Emily Rodriguez',
+      taskName: 'Mobile App Responsive Design',
+      category: 'Product',
+      description: 'Create responsive layouts for mobile devices and ensure cross-browser compatibility.',
+      startDate: yesterday,
+      estimatedEndDate: tomorrow,
+      toolLinks: [
+        { id: '5', name: 'Mobile Specs', url: 'https://confluence.company.com/mobile' }
+      ]
+    },
+    {
+      id: '4',
+      employeeName: 'David Park',
+      taskName: 'Machine Learning Model Training',
+      category: 'R&D',
+      description: 'Train and validate new recommendation algorithm using customer behavior data.',
+      startDate: tomorrow,
+      estimatedEndDate: nextWeek,
+      toolLinks: [
+        { id: '6', name: 'ML Pipeline', url: 'https://jupyter.company.com/notebooks' },
+        { id: '7', name: 'Dataset Repository', url: 'https://data.company.com/recommendations' }
+      ]
+    },
+    {
+      id: '5',
+      employeeName: 'Lisa Wang',
+      taskName: 'Customer Dashboard Analytics',
+      category: 'Product',
+      description: 'Build comprehensive analytics dashboard with real-time metrics and data visualization.',
+      startDate: yesterday,
+      estimatedEndDate: yesterday,
+      actualEndDate: yesterday,
+      toolLinks: [
+        { id: '8', name: 'Analytics Requirements', url: 'https://docs.company.com/analytics' }
+      ]
+    },
+    {
+      id: '6',
+      employeeName: 'Alex Thompson',
+      taskName: 'Security Audit Implementation',
+      category: 'R&D',
+      description: 'Conduct comprehensive security review and implement recommended security measures.',
+      startDate: today,
+      estimatedEndDate: nextWeek,
+      toolLinks: []
+    }
+  ];
+};
+
 const Index = () => {
-  const [tasks, setTasks] = useState<Task[]>([]);
+  const [tasks, setTasks] = useState<Task[]>(getSampleTasks());
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [filterCategory, setFilterCategory] = useState<'all' | 'Product' | 'R&D'>('all');
   const [searchTerm, setSearchTerm] = useState('');
