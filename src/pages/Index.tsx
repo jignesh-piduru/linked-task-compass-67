@@ -2,8 +2,9 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, Filter } from 'lucide-react';
-import TaskCard from '@/components/TaskCard';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
+import { Plus, Filter, Edit, Trash2, ExternalLink } from 'lucide-react';
 import TaskForm from '@/components/TaskForm';
 import { Task } from '@/types/Task';
 
@@ -96,8 +97,11 @@ const getSampleTasks = (): Task[] => {
 const Index = () => {
   const [tasks, setTasks] = useState<Task[]>(getSampleTasks());
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [filterCategory, setFilterCategory] = useState<'all' | 'Product' | 'R&D'>('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(5);
 
   const addTask = (newTask: Omit<Task, 'id'>) => {
     const task: Task = {
@@ -112,6 +116,7 @@ const Index = () => {
     setTasks(tasks.map(task => 
       task.id === updatedTask.id ? updatedTask : task
     ));
+    setEditingTask(null);
   };
 
   const deleteTask = (taskId: string) => {
@@ -148,6 +153,35 @@ const Index = () => {
                            task.employeeName.toLowerCase().includes(searchTerm.toLowerCase());
       return matchesCategory && matchesSearch;
     });
+  };
+
+  const getPaginatedTasks = (filteredTasks: Task[]) => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return filteredTasks.slice(startIndex, endIndex);
+  };
+
+  const getTotalPages = (totalItems: number) => {
+    return Math.ceil(totalItems / itemsPerPage);
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString();
+  };
+
+  const getStatusBadge = (task: Task) => {
+    if (task.actualEndDate) {
+      return <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">Completed</span>;
+    }
+    if (task.startDate > today) {
+      return <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">Future</span>;
+    }
+    return <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800">In Progress</span>;
+  };
+
+  const getCategoryBadge = (category: string) => {
+    const colorClass = category === 'Product' ? 'bg-purple-100 text-purple-800' : 'bg-teal-100 text-teal-800';
+    return <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${colorClass}`}>{category}</span>;
   };
 
   const completedTasks = tasks.filter(task => task.actualEndDate).length;
@@ -223,7 +257,7 @@ const Index = () => {
 
       {/* Tabbed Task Views */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
-        <Tabs defaultValue="today" className="w-full">
+        <Tabs defaultValue="today" className="w-full" onValueChange={() => setCurrentPage(1)}>
           <TabsList className="grid w-full grid-cols-5 mb-6">
             <TabsTrigger value="today">Today</TabsTrigger>
             <TabsTrigger value="all">All Tasks</TabsTrigger>
@@ -236,6 +270,8 @@ const Index = () => {
             <TabsContent key={tabValue} value={tabValue}>
               {(() => {
                 const filteredTasks = getFilteredTasks(tabValue);
+                const paginatedTasks = getPaginatedTasks(filteredTasks);
+                const totalPages = getTotalPages(filteredTasks.length);
                 
                 if (filteredTasks.length === 0) {
                   return (
@@ -264,15 +300,119 @@ const Index = () => {
                 }
 
                 return (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {filteredTasks.map((task) => (
-                      <TaskCard
-                        key={task.id}
-                        task={task}
-                        onUpdate={updateTask}
-                        onDelete={deleteTask}
-                      />
-                    ))}
+                  <div className="bg-white rounded-2xl shadow-sm border border-slate-200">
+                    {/* Records Count */}
+                    <div className="px-6 py-4 border-b border-slate-200">
+                      <p className="text-sm text-slate-600">
+                        Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, filteredTasks.length)} of {filteredTasks.length} records
+                      </p>
+                    </div>
+
+                    {/* Table */}
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Employee</TableHead>
+                          <TableHead>Task Name</TableHead>
+                          <TableHead>Category</TableHead>
+                          <TableHead>Status</TableHead>
+                          <TableHead>Start Date</TableHead>
+                          <TableHead>Est. End Date</TableHead>
+                          <TableHead>Actual End Date</TableHead>
+                          <TableHead>Tool Links</TableHead>
+                          <TableHead>Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {paginatedTasks.map((task) => (
+                          <TableRow key={task.id}>
+                            <TableCell className="font-medium">{task.employeeName}</TableCell>
+                            <TableCell>
+                              <div>
+                                <div className="font-medium">{task.taskName}</div>
+                                <div className="text-sm text-slate-500 truncate max-w-xs">{task.description}</div>
+                              </div>
+                            </TableCell>
+                            <TableCell>{getCategoryBadge(task.category)}</TableCell>
+                            <TableCell>{getStatusBadge(task)}</TableCell>
+                            <TableCell>{formatDate(task.startDate)}</TableCell>
+                            <TableCell>{formatDate(task.estimatedEndDate)}</TableCell>
+                            <TableCell>{task.actualEndDate ? formatDate(task.actualEndDate) : '-'}</TableCell>
+                            <TableCell>
+                              <div className="flex gap-1">
+                                {task.toolLinks.slice(0, 2).map((link) => (
+                                  <a
+                                    key={link.id}
+                                    href={link.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center px-2 py-1 text-xs bg-slate-100 hover:bg-slate-200 rounded"
+                                  >
+                                    <ExternalLink className="h-3 w-3 mr-1" />
+                                    {link.name}
+                                  </a>
+                                ))}
+                                {task.toolLinks.length > 2 && (
+                                  <span className="text-xs text-slate-500">+{task.toolLinks.length - 2} more</span>
+                                )}
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex gap-2">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => setEditingTask(task)}
+                                >
+                                  <Edit className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => deleteTask(task.id)}
+                                  className="text-red-600 hover:text-red-700"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+
+                    {/* Pagination */}
+                    {totalPages > 1 && (
+                      <div className="px-6 py-4 border-t border-slate-200">
+                        <Pagination>
+                          <PaginationContent>
+                            <PaginationItem>
+                              <PaginationPrevious 
+                                onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                                className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                              />
+                            </PaginationItem>
+                            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                              <PaginationItem key={page}>
+                                <PaginationLink
+                                  onClick={() => setCurrentPage(page)}
+                                  isActive={currentPage === page}
+                                  className="cursor-pointer"
+                                >
+                                  {page}
+                                </PaginationLink>
+                              </PaginationItem>
+                            ))}
+                            <PaginationItem>
+                              <PaginationNext 
+                                onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                                className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                              />
+                            </PaginationItem>
+                          </PaginationContent>
+                        </Pagination>
+                      </div>
+                    )}
                   </div>
                 );
               })()}
@@ -282,10 +422,14 @@ const Index = () => {
       </div>
 
       {/* Task Form Modal */}
-      {isFormOpen && (
+      {(isFormOpen || editingTask) && (
         <TaskForm
-          onSubmit={addTask}
-          onClose={() => setIsFormOpen(false)}
+          task={editingTask}
+          onSubmit={editingTask ? updateTask : addTask}
+          onClose={() => {
+            setIsFormOpen(false);
+            setEditingTask(null);
+          }}
         />
       )}
     </div>
