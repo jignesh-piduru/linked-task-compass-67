@@ -1,21 +1,23 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { X } from 'lucide-react';
 import { Task } from '@/types/Task';
+import { Employee } from '@/types/Employee';
 import ToolLinkManager from './ToolLinkManager';
 
 interface TaskFormProps {
   task?: Task;
+  employees: Employee[];
   onSubmit: (task: Omit<Task, 'id'>) => void;
   onClose: () => void;
 }
 
-const TaskForm = ({ task, onSubmit, onClose }: TaskFormProps) => {
+const TaskForm = ({ task, employees, onSubmit, onClose }: TaskFormProps) => {
   const [formData, setFormData] = useState({
     employeeName: task?.employeeName || '',
     taskName: task?.taskName || '',
@@ -57,14 +59,19 @@ const TaskForm = ({ task, onSubmit, onClose }: TaskFormProps) => {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="employeeName">Employee Name</Label>
-                <Input
-                  id="employeeName"
-                  value={formData.employeeName}
-                  onChange={(e) => handleInputChange('employeeName', e.target.value)}
-                  required
-                  placeholder="Enter employee name"
-                />
+                <Label htmlFor="employeeName">Employee</Label>
+                <Select value={formData.employeeName} onValueChange={(value) => handleInputChange('employeeName', value)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select employee" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {employees.map((employee) => (
+                      <SelectItem key={employee.id} value={employee.name}>
+                        {employee.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="space-y-2">
@@ -81,16 +88,15 @@ const TaskForm = ({ task, onSubmit, onClose }: TaskFormProps) => {
 
             <div className="space-y-2">
               <Label htmlFor="category">Category</Label>
-              <select
-                id="category"
-                value={formData.category}
-                onChange={(e) => handleInputChange('category', e.target.value)}
-                className="w-full border border-slate-300 rounded-lg px-3 py-2 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                required
-              >
-                <option value="Product">Product</option>
-                <option value="R&D">R&D</option>
-              </select>
+              <Select value={formData.category} onValueChange={(value) => handleInputChange('category', value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Product">Product</SelectItem>
+                  <SelectItem value="R&D">R&D</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="space-y-2">
