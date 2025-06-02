@@ -386,6 +386,15 @@ const Index = () => {
     }
   };
 
+  const getTodaysTasks = () => {
+    const today = new Date().toISOString().split('T')[0];
+    return tasks.filter(task => 
+      task.startDate === today || 
+      task.estimatedEndDate === today ||
+      (task.startDate <= today && task.estimatedEndDate >= today && !task.actualEndDate)
+    );
+  };
+
   // Navigate to Analytics page when analytics tab is selected
   if (activeTab === 'analytics') {
     navigate('/analytics');
@@ -901,44 +910,63 @@ const Index = () => {
           <CardHeader>
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <CardTitle className="flex items-center gap-2">
-                <Target className="h-5 w-5 text-blue-600" />
-                Recent Tasks
+                <Clock className="h-5 w-5 text-blue-600" />
+                Today's Tasks
               </CardTitle>
               <Button 
                 variant="outline" 
-                onClick={() => setActiveTab('tasks-all')}
+                onClick={() => setActiveTab('tasks-today')}
                 className="text-blue-600 hover:bg-blue-50 w-full sm:w-auto"
               >
-                View All Tasks
+                View All Today's Tasks
               </Button>
             </div>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {tasks.slice(0, 3).map((task) => (
-                <div key={task.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors gap-4">
-                  <div className="flex items-center space-x-3 flex-1 min-w-0">
-                    <div className={`w-3 h-3 rounded-full flex-shrink-0 ${
-                      task.actualEndDate ? 'bg-green-500' : 'bg-blue-500'
-                    }`} />
-                    <div className="min-w-0 flex-1">
-                      <button 
-                        onClick={() => navigate(`/task/${task.id}`)}
-                        className="font-medium text-slate-800 hover:text-blue-600 hover:underline text-left"
-                      >
-                        {task.taskName}
-                      </button>
-                      <p className="text-sm text-slate-500">Assigned to {task.employeeName}</p>
+              {getTodaysTasks().length > 0 ? (
+                getTodaysTasks().slice(0, 3).map((task) => (
+                  <div key={task.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors gap-4">
+                    <div className="flex items-center space-x-3 flex-1 min-w-0">
+                      <div className={`w-3 h-3 rounded-full flex-shrink-0 ${
+                        task.actualEndDate ? 'bg-green-500' : 'bg-blue-500'
+                      }`} />
+                      <div className="min-w-0 flex-1">
+                        <button 
+                          onClick={() => navigate(`/task/${task.id}`)}
+                          className="font-medium text-slate-800 hover:text-blue-600 hover:underline text-left"
+                        >
+                          {task.taskName}
+                        </button>
+                        <p className="text-sm text-slate-500">Assigned to {task.employeeName}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 flex-shrink-0 w-full sm:w-auto justify-between sm:justify-end">
+                      <Badge variant="secondary">
+                        {task.category}
+                      </Badge>
+                      <span className="text-sm text-slate-500">{task.estimatedEndDate}</span>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 flex-shrink-0 w-full sm:w-auto justify-between sm:justify-end">
-                    <Badge variant="secondary">
-                      {task.category}
-                    </Badge>
-                    <span className="text-sm text-slate-500">{task.estimatedEndDate}</span>
-                  </div>
+                ))
+              ) : (
+                <div className="text-center py-8">
+                  <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">
+                    No tasks scheduled for today
+                  </h3>
+                  <p className="text-gray-500 mb-4 text-sm sm:text-base px-4">
+                    You don't have any tasks starting, due, or active today. Great job staying on top of your work!
+                  </p>
+                  <Button 
+                    onClick={() => setShowTaskDialog(true)}
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                  >
+                    <Plus className="mr-2 h-4 w-4" />
+                    Schedule a Task for Today
+                  </Button>
                 </div>
-              ))}
+              )}
             </div>
           </CardContent>
         </Card>

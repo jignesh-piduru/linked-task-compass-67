@@ -5,7 +5,6 @@ import {
   LayoutDashboard, 
   CheckSquare, 
   Users, 
-  BarChart3, 
   ChevronDown,
   Clock,
   List,
@@ -37,7 +36,6 @@ const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
       ]
     },
     { id: 'employees', label: 'Employees', icon: Users },
-    { id: 'analytics', label: 'Analytics', icon: BarChart3 },
   ];
 
   const handleTasksClick = () => {
