@@ -78,7 +78,10 @@ const Index = () => {
       department: 'Engineering',
       position: 'Senior Developer',
       skills: ['React', 'TypeScript', 'Node.js'],
-      createdDate: '2024-01-01'
+      createdDate: '2024-01-01',
+      status: 'active',
+      role: 'employee',
+      premiumAccess: false
     },
     {
       id: '2',
@@ -87,7 +90,10 @@ const Index = () => {
       department: 'Design',
       position: 'UX Designer',
       skills: ['Figma', 'Sketch', 'User Research'],
-      createdDate: '2024-01-02'
+      createdDate: '2024-01-02',
+      status: 'active',
+      role: 'employee',
+      premiumAccess: false
     },
     {
       id: '3',
@@ -96,7 +102,10 @@ const Index = () => {
       department: 'Engineering',
       position: 'Backend Developer',
       skills: ['Python', 'PostgreSQL', 'Docker'],
-      createdDate: '2024-01-03'
+      createdDate: '2024-01-03',
+      status: 'active',
+      role: 'employee',
+      premiumAccess: false
     }
   ]);
 
@@ -202,7 +211,7 @@ const Index = () => {
                       <p className="text-slate-600 text-sm">{employee.position}</p>
                       <p className="text-slate-500 text-xs">{employee.email}</p>
                       <div className="flex flex-wrap gap-1 mt-2">
-                        {employee.skills.map((skill) => (
+                        {employee.skills?.map((skill) => (
                           <Badge key={skill} variant="outline" className="text-xs">
                             {skill}
                           </Badge>
