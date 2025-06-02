@@ -1,6 +1,6 @@
+
 import { useState } from 'react';
 import Sidebar from '@/components/Sidebar';
-import TaskGrid from '@/components/TaskGrid';
 import TaskDetails from '@/components/TaskDetails';
 import TaskForm from '@/components/TaskForm';
 import EmployeeForm from '@/components/EmployeeForm';
@@ -75,6 +75,30 @@ const Index = () => {
       role: 'manager',
       premiumAccess: true,
       skills: ['Digital Marketing', 'Analytics', 'Content Strategy']
+    },
+    {
+      id: '4',
+      name: 'Alex Kim',
+      email: 'alex.kim@company.com',
+      department: 'Engineering',
+      position: 'DevOps Engineer',
+      createdDate: '2024-03-10',
+      status: 'active',
+      role: 'employee',
+      premiumAccess: false,
+      skills: ['AWS', 'Docker', 'Kubernetes']
+    },
+    {
+      id: '5',
+      name: 'Lisa Wang',
+      email: 'lisa.wang@company.com',
+      department: 'Design',
+      position: 'UX Researcher',
+      createdDate: '2024-02-20',
+      status: 'active',
+      role: 'employee',
+      premiumAccess: true,
+      skills: ['User Research', 'Data Analysis', 'Figma']
     }
   ]);
 
@@ -168,7 +192,7 @@ const Index = () => {
               ← Back to Tasks
             </Button>
           </div>
-          <TaskDetails task={selectedTask} onClose={() => setSelectedTask(null)} />
+          <TaskDetails task={selectedTask} />
         </div>
       );
     }
@@ -206,7 +230,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       <div className="flex">
-        <Sidebar />
+        <Sidebar activeTab={currentView} onTabChange={setCurrentView} />
         
         <div className="flex-1 ml-64">
           <div className="p-8">
@@ -278,7 +302,7 @@ const Index = () => {
                   <TaskForm 
                     onSubmit={handleAddTask} 
                     employees={employees} 
-                    onClose={() => setShowTaskForm(false)} 
+                    onClose={() => setShowTaskForm(false)}
                   />
                 </CardContent>
               </Card>
@@ -298,7 +322,7 @@ const Index = () => {
                 <CardContent>
                   <EmployeeForm 
                     onSubmit={handleAddEmployee} 
-                    onClose={() => setShowEmployeeForm(false)} 
+                    onClose={() => setShowEmployeeForm(false)}
                   />
                 </CardContent>
               </Card>
