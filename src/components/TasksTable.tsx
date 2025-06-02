@@ -47,7 +47,7 @@ const TasksTable: React.FC<TasksTableProps> = ({
   const getStatusBadge = (task: Task) => {
     if (task.actualEndDate) {
       return (
-        <Badge className="bg-green-500 text-white border-green-500 hover:bg-green-600">
+        <Badge className="bg-gradient-to-r from-green-500 to-green-600 text-white border-0 shadow-sm font-medium">
           Completed
         </Badge>
       );
@@ -56,14 +56,14 @@ const TasksTable: React.FC<TasksTableProps> = ({
     const isOverdue = new Date(task.estimatedEndDate) < new Date();
     if (isOverdue) {
       return (
-        <Badge className="bg-red-500 text-white border-red-500 hover:bg-red-600">
-          In Progress
+        <Badge className="bg-gradient-to-r from-red-500 to-red-600 text-white border-0 shadow-sm font-medium">
+          Overdue
         </Badge>
       );
     }
     
     return (
-      <Badge className="bg-red-500 text-white border-red-500 hover:bg-red-600">
+      <Badge className="bg-gradient-to-r from-blue-500 to-blue-600 text-white border-0 shadow-sm font-medium">
         In Progress
       </Badge>
     );
@@ -74,9 +74,9 @@ const TasksTable: React.FC<TasksTableProps> = ({
       <Badge 
         className={`
           ${category === 'Product' 
-            ? 'bg-purple-100 text-purple-700 border-purple-200' 
-            : 'bg-teal-100 text-teal-700 border-teal-200'
-          } font-medium
+            ? 'bg-gradient-to-r from-purple-100 to-purple-50 text-purple-800 border-purple-200 shadow-sm' 
+            : 'bg-gradient-to-r from-teal-100 to-teal-50 text-teal-800 border-teal-200 shadow-sm'
+          } font-medium backdrop-blur-sm
         `}
       >
         {category}
@@ -104,24 +104,24 @@ const TasksTable: React.FC<TasksTableProps> = ({
       <>
         <div className={containerClass}>
           {tasks.map((task) => (
-            <Card key={task.id} className="shadow-sm border border-gray-200">
-              <CardContent className="p-4">
-                <div className="space-y-3">
+            <Card key={task.id} className="shadow-lg border-0 bg-gradient-to-br from-white to-slate-50 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+              <CardContent className="p-6">
+                <div className="space-y-4">
                   <div className="flex items-start justify-between">
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-gray-900 text-sm">
+                      <h3 className="font-bold text-gray-900 text-sm mb-2">
                         {task.taskName}
                       </h3>
-                      <p className="text-xs text-gray-500 mt-1 line-clamp-2">
+                      <p className="text-xs text-gray-600 mt-1 line-clamp-2 leading-relaxed">
                         {task.description}
                       </p>
                     </div>
-                    <div className="flex gap-1 ml-2">
+                    <div className="flex gap-2 ml-3">
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => setSelectedTask(task)}
-                        className="h-8 w-8 p-0 text-blue-600 hover:bg-blue-50"
+                        className="h-9 w-9 p-0 text-blue-600 hover:bg-blue-50 hover:text-blue-700 rounded-full transition-all duration-200"
                       >
                         <Eye className="h-4 w-4" />
                       </Button>
@@ -129,7 +129,7 @@ const TasksTable: React.FC<TasksTableProps> = ({
                         variant="ghost"
                         size="sm"
                         onClick={() => handleDelete(task.id)}
-                        className="h-8 w-8 p-0 text-red-600 hover:bg-red-50"
+                        className="h-9 w-9 p-0 text-red-600 hover:bg-red-50 hover:text-red-700 rounded-full transition-all duration-200"
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
@@ -205,132 +205,143 @@ const TasksTable: React.FC<TasksTableProps> = ({
     );
   }
 
-  // Desktop table view
+  // Desktop table view with premium styling
   const tableContainerClass = isCompletedTasks 
-    ? "bg-white rounded-lg shadow-sm border border-gray-200 max-h-[500px] overflow-auto scroll-smooth"
-    : "bg-white rounded-lg shadow-sm border border-gray-200";
+    ? "bg-gradient-to-br from-white to-slate-50 rounded-xl shadow-xl border-0 max-h-[500px] backdrop-blur-sm"
+    : "bg-gradient-to-br from-white to-slate-50 rounded-xl shadow-xl border-0 backdrop-blur-sm";
 
   const headerClass = isCompletedTasks
-    ? "bg-gray-50 border-b border-gray-200 sticky top-0 z-10"
-    : "bg-gray-50 border-b border-gray-200";
+    ? "bg-gradient-to-r from-slate-100 to-slate-50 border-b border-slate-200 sticky top-0 z-20 backdrop-blur-sm"
+    : "bg-gradient-to-r from-slate-100 to-slate-50 border-b border-slate-200 backdrop-blur-sm";
 
   return (
     <>
       <div className={tableContainerClass}>
-        <div className="overflow-x-auto">
-          <Table className="min-w-[1200px]">
-            <TableHeader>
-              <TableRow className={headerClass}>
-                <TableHead className="font-semibold text-gray-700 px-6 py-4 text-left w-32">Employee</TableHead>
-                <TableHead className="font-semibold text-gray-700 px-6 py-4 text-left min-w-80">Task Name</TableHead>
-                <TableHead className="font-semibold text-gray-700 px-6 py-4 text-left w-32">Category</TableHead>
-                <TableHead className="font-semibold text-gray-700 px-6 py-4 text-left w-32">Status</TableHead>
-                <TableHead className="font-semibold text-gray-700 px-6 py-4 text-left w-28">Start Date</TableHead>
-                <TableHead className="font-semibold text-gray-700 px-6 py-4 text-left w-28">Est. End Date</TableHead>
-                <TableHead className="font-semibold text-gray-700 px-6 py-4 text-left w-32">Actual End Date</TableHead>
-                <TableHead className="font-semibold text-gray-700 px-6 py-4 text-left w-40">Tool Links</TableHead>
-                <TableHead className="font-semibold text-gray-700 px-6 py-4 text-left w-24">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {tasks.map((task) => (
-                <TableRow key={task.id} className="hover:bg-gray-50 border-b border-gray-100">
-                  <TableCell className="px-6 py-4">
-                    <div className="font-medium text-gray-900">
-                      {task.employeeName}
-                    </div>
-                  </TableCell>
-                  <TableCell className="px-6 py-4">
-                    <div className="max-w-xs">
-                      <div className="font-semibold text-gray-900 mb-1">
-                        {task.taskName}
-                      </div>
-                      <div className="text-sm text-gray-500 line-clamp-2">
-                        {task.description}
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell className="px-6 py-4">
-                    <div className="space-y-1">
-                      {getCategoryBadge(task.category)}
-                      <div className="text-xs text-gray-500">
-                        {getCategorySubtext(task.category)}
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell className="px-6 py-4">
-                    {getStatusBadge(task)}
-                  </TableCell>
-                  <TableCell className="px-6 py-4 text-gray-700">
-                    {formatDate(task.startDate)}
-                  </TableCell>
-                  <TableCell className="px-6 py-4 text-gray-700">
-                    {formatDate(task.estimatedEndDate)}
-                  </TableCell>
-                  <TableCell className="px-6 py-4 text-gray-700">
-                    {formatDate(task.actualEndDate)}
-                  </TableCell>
-                  <TableCell className="px-6 py-4">
-                    {task.toolLinks && task.toolLinks.length > 0 ? (
-                      <div className="space-y-1 max-w-40">
-                        {task.toolLinks.slice(0, 2).map((link) => (
-                          <a
-                            key={link.id}
-                            href={link.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center text-xs text-blue-600 hover:text-blue-800 hover:underline"
-                          >
-                            <ExternalLink className="mr-1 h-3 w-3 flex-shrink-0" />
-                            <span className="truncate">{link.name}</span>
-                          </a>
-                        ))}
-                        {task.toolLinks.length > 2 && (
-                          <div className="text-xs text-gray-500">
-                            +{task.toolLinks.length - 2} more
-                          </div>
-                        )}
-                      </div>
-                    ) : (
-                      <span className="text-gray-400 text-sm">No links</span>
-                    )}
-                  </TableCell>
-                  <TableCell className="px-6 py-4">
-                    <div className="flex gap-1">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setSelectedTask(task)}
-                        className="h-8 w-8 p-0 text-blue-600 hover:bg-blue-50 hover:text-blue-700"
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 w-8 p-0 text-gray-600 hover:bg-gray-50 hover:text-gray-700"
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleDelete(task.id)}
-                        className="h-8 w-8 p-0 text-red-600 hover:bg-red-50 hover:text-red-700"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
+        <ScrollArea className="h-full w-full">
+          <div className="min-w-[1200px]">
+            <Table>
+              <TableHeader>
+                <TableRow className={headerClass}>
+                  <TableHead className="font-bold text-slate-800 px-6 py-5 text-left w-32">Employee</TableHead>
+                  <TableHead className="font-bold text-slate-800 px-6 py-5 text-left min-w-80">Task Name</TableHead>
+                  <TableHead className="font-bold text-slate-800 px-6 py-5 text-left w-32">Category</TableHead>
+                  <TableHead className="font-bold text-slate-800 px-6 py-5 text-left w-32">Status</TableHead>
+                  <TableHead className="font-bold text-slate-800 px-6 py-5 text-left w-28">Start Date</TableHead>
+                  <TableHead className="font-bold text-slate-800 px-6 py-5 text-left w-28">Est. End Date</TableHead>
+                  <TableHead className="font-bold text-slate-800 px-6 py-5 text-left w-32">Actual End Date</TableHead>
+                  <TableHead className="font-bold text-slate-800 px-6 py-5 text-left w-40">Tool Links</TableHead>
+                  <TableHead className="font-bold text-slate-800 px-6 py-5 text-left w-24">Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+              </TableHeader>
+              <TableBody>
+                {tasks.map((task, index) => (
+                  <TableRow 
+                    key={task.id} 
+                    className={`
+                      hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 
+                      border-b border-slate-100 transition-all duration-200
+                      ${index % 2 === 0 ? 'bg-white' : 'bg-slate-50/30'}
+                    `}
+                  >
+                    <TableCell className="px-6 py-5">
+                      <div className="font-semibold text-slate-900">
+                        {task.employeeName}
+                      </div>
+                    </TableCell>
+                    <TableCell className="px-6 py-5">
+                      <div className="max-w-xs">
+                        <div className="font-bold text-slate-900 mb-2">
+                          {task.taskName}
+                        </div>
+                        <div className="text-sm text-slate-600 line-clamp-2 leading-relaxed">
+                          {task.description}
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell className="px-6 py-5">
+                      <div className="space-y-2">
+                        {getCategoryBadge(task.category)}
+                        <div className="text-xs text-slate-500 font-medium">
+                          {getCategorySubtext(task.category)}
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell className="px-6 py-5">
+                      {getStatusBadge(task)}
+                    </TableCell>
+                    <TableCell className="px-6 py-5 text-slate-700 font-medium">
+                      {formatDate(task.startDate)}
+                    </TableCell>
+                    <TableCell className="px-6 py-5 text-slate-700 font-medium">
+                      {formatDate(task.estimatedEndDate)}
+                    </TableCell>
+                    <TableCell className="px-6 py-5 text-slate-700 font-medium">
+                      {formatDate(task.actualEndDate)}
+                    </TableCell>
+                    <TableCell className="px-6 py-5">
+                      {task.toolLinks && task.toolLinks.length > 0 ? (
+                        <div className="space-y-2 max-w-40">
+                          {task.toolLinks.slice(0, 2).map((link) => (
+                            <a
+                              key={link.id}
+                              href={link.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center text-xs text-blue-600 hover:text-blue-800 hover:underline transition-colors duration-200 font-medium"
+                            >
+                              <ExternalLink className="mr-2 h-3 w-3 flex-shrink-0" />
+                              <span className="truncate">{link.name}</span>
+                            </a>
+                          ))}
+                          {task.toolLinks.length > 2 && (
+                            <div className="text-xs text-slate-500 font-medium">
+                              +{task.toolLinks.length - 2} more
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="text-slate-400 text-sm font-medium">No links</span>
+                      )}
+                    </TableCell>
+                    <TableCell className="px-6 py-5">
+                      <div className="flex gap-1">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setSelectedTask(task)}
+                          className="h-9 w-9 p-0 text-blue-600 hover:bg-blue-100 hover:text-blue-700 rounded-full transition-all duration-200"
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-9 w-9 p-0 text-slate-600 hover:bg-slate-100 hover:text-slate-700 rounded-full transition-all duration-200"
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDelete(task.id)}
+                          className="h-9 w-9 p-0 text-red-600 hover:bg-red-100 hover:text-red-700 rounded-full transition-all duration-200"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+          <ScrollBar orientation="horizontal" className="bg-slate-200" />
+          {isCompletedTasks && <ScrollBar orientation="vertical" className="bg-slate-200" />}
+        </ScrollArea>
         
         {tasks.length > 0 && !isCompletedTasks && (
-          <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
-            <p className="text-sm text-gray-600">
+          <div className="px-6 py-4 border-t border-slate-200 bg-gradient-to-r from-slate-50 to-slate-100">
+            <p className="text-sm text-slate-600 font-medium">
               Showing 1 to {tasks.length} of {tasks.length} records
             </p>
           </div>
