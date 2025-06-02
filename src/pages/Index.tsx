@@ -242,16 +242,16 @@ const Index = () => {
     let filteredByTab = tasks;
 
     switch (tabFilter) {
-      case 'today':
+      case 'tasks-today':
         filteredByTab = tasks.filter(task => task.startDate === today);
         break;
-      case 'pending':
-        filteredByTab = tasks.filter(task => !task.actualEndDate);
+      case 'tasks-all':
+        filteredByTab = tasks;
         break;
-      case 'completed':
+      case 'tasks-completed':
         filteredByTab = tasks.filter(task => !!task.actualEndDate);
         break;
-      case 'future':
+      case 'tasks-future':
         filteredByTab = tasks.filter(task => task.startDate > today);
         break;
       case 'all':
@@ -342,6 +342,7 @@ const Index = () => {
   const inProgressTasks = tasks.filter(task => !task.actualEndDate).length;
   const todayTasks = tasks.filter(task => task.startDate === today).length;
   const futureTasks = tasks.filter(task => task.startDate > today).length;
+  const totalEmployees = employees.length;
 
   const handleUserNameClick = (employee: Employee) => {
     const userSlug = employee.name.toLowerCase().replace(/\s+/g, '-');
@@ -438,15 +439,30 @@ const Index = () => {
     }
   };
 
+  const getTaskTypeTitle = (activeTab: string) => {
+    switch (activeTab) {
+      case 'tasks-today':
+        return "Today's Tasks";
+      case 'tasks-all':
+        return 'All Tasks';
+      case 'tasks-completed':
+        return 'Completed Tasks';
+      case 'tasks-future':
+        return 'Future Tasks';
+      default:
+        return 'Tasks';
+    }
+  };
+
   const renderTasksView = () => {
-    const filteredTasks = getFilteredTasks('all');
+    const filteredTasks = getFilteredTasks(activeTab);
     
     return (
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-slate-900">Tasks</h2>
+            <h2 className="text-2xl font-bold text-slate-900">{getTaskTypeTitle(activeTab)}</h2>
             <p className="text-slate-600">Manage your team's tasks and projects</p>
           </div>
           <div className="flex gap-3">
@@ -688,10 +704,6 @@ const Index = () => {
   };
 
   const renderDashboard = () => {
-    const completedTasks = tasks.filter(task => task.actualEndDate).length;
-    const inProgressTasks = tasks.filter(task => !task.actualEndDate).length;
-    const todayTasks = tasks.filter(task => task.startDate === new Date().toISOString().split('T')[0]).length;
-
     return (
       <div className="space-y-6">
         <div>
@@ -700,7 +712,7 @@ const Index = () => {
         </div>
         
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl p-6 text-white">
             <h3 className="text-lg font-semibold">Total Tasks</h3>
             <p className="text-3xl font-bold">{tasks.length}</p>
@@ -711,7 +723,17 @@ const Index = () => {
           </div>
           <div className="bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl p-6 text-white">
             <h3 className="text-lg font-semibold">In Progress</h3>
-            <p className="text-3xl font-bold">{inProgressTasks}</p>
+            <div className="flex items-center justify-between">
+              <p className="text-3xl font-bold">{inProgressTasks}</p>
+              <div className="text-right">
+                <p className="text-sm opacity-90">Total Employees</p>
+                <p className="text-xl font-semibold">{totalEmployees}</p>
+              </div>
+            </div>
+          </div>
+          <div className="bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl p-6 text-white">
+            <h3 className="text-lg font-semibold">Future Tasks</h3>
+            <p className="text-3xl font-bold">{futureTasks}</p>
           </div>
         </div>
 
@@ -735,20 +757,109 @@ const Index = () => {
     );
   };
 
+  const renderCalendar = () => {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-2xl font-bold text-slate-900">Calendar</h2>
+          <p className="text-slate-600">View tasks and deadlines in calendar format</p>
+        </div>
+        <div className="bg-white rounded-xl shadow-lg border border-slate-200 p-8">
+          <div className="text-center py-12">
+            <Calendar className="mx-auto h-12 w-12 text-slate-400 mb-4" />
+            <h3 className="text-lg font-medium text-slate-900 mb-2">Calendar View</h3>
+            <p className="text-slate-600">Calendar functionality coming soon</p>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderAnalytics = () => {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-2xl font-bold text-slate-900">Analytics</h2>
+          <p className="text-slate-600">Track performance and productivity metrics</p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="bg-white rounded-xl shadow-lg border border-slate-200 p-6">
+            <h3 className="text-lg font-semibold text-slate-900 mb-4">Task Completion Rate</h3>
+            <div className="text-center py-8">
+              <div className="text-4xl font-bold text-green-600">
+                {tasks.length > 0 ? Math.round((completedTasks / tasks.length) * 100) : 0}%
+              </div>
+              <p className="text-slate-600 mt-2">Tasks Completed</p>
+            </div>
+          </div>
+          <div className="bg-white rounded-xl shadow-lg border border-slate-200 p-6">
+            <h3 className="text-lg font-semibold text-slate-900 mb-4">Team Performance</h3>
+            <div className="space-y-3">
+              <div className="flex justify-between">
+                <span className="text-slate-600">Active Employees</span>
+                <span className="font-semibold">{employees.filter(emp => emp.status === 'active').length}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-600">Avg Tasks per Employee</span>
+                <span className="font-semibold">{totalEmployees > 0 ? Math.round(tasks.length / totalEmployees) : 0}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderSettings = () => {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-2xl font-bold text-slate-900">Settings</h2>
+          <p className="text-slate-600">Configure your application preferences</p>
+        </div>
+        <div className="bg-white rounded-xl shadow-lg border border-slate-200 p-6">
+          <div className="space-y-6">
+            <div>
+              <h3 className="text-lg font-semibold text-slate-900 mb-3">General Settings</h3>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-700">Email Notifications</span>
+                  <Button variant="outline" size="sm">Configure</Button>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-700">Theme Preferences</span>
+                  <Button variant="outline" size="sm">Customize</Button>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-700">Data Export</span>
+                  <Button variant="outline" size="sm">Manage</Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   const renderContent = () => {
+    if (activeTab.startsWith('tasks-')) {
+      return renderTasksView();
+    }
+    
     switch (activeTab) {
       case 'dashboard':
         return renderDashboard();
-      case 'tasks':
-        return renderTasksView();
       case 'employees':
         return renderEmployeesView();
+      case 'calendar':
+        return renderCalendar();
+      case 'analytics':
+        return renderAnalytics();
+      case 'settings':
+        return renderSettings();
       default:
-        return (
-          <div className="flex items-center justify-center h-64">
-            <p className="text-slate-500">Coming soon...</p>
-          </div>
-        );
+        return renderDashboard();
     }
   };
 
