@@ -529,11 +529,11 @@ const Index = () => {
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-4">
-                      <div className="w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center text-white font-semibold">
+                      <div className="w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center text-white font-semibold flex-shrink-0">
                         {employee.name.split(' ').map(n => n[0]).join('')}
                       </div>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-3 flex-wrap">
                           <button 
                             onClick={() => navigate(`/user/${employee.id}`)}
                             className="text-blue-600 hover:text-blue-800 hover:underline font-medium text-lg"
@@ -564,7 +564,7 @@ const Index = () => {
                         </div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-shrink-0">
                       <Button
                         variant="outline"
                         size="sm"
@@ -900,10 +900,10 @@ const Index = () => {
               {tasks.slice(0, 3).map((task) => (
                 <div key={task.id} className="flex items-center justify-between p-4 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">
                   <div className="flex items-center space-x-3">
-                    <div className={`w-3 h-3 rounded-full ${
+                    <div className={`w-3 h-3 rounded-full flex-shrink-0 ${
                       task.actualEndDate ? 'bg-green-500' : 'bg-blue-500'
                     }`} />
-                    <div>
+                    <div className="min-w-0 flex-1">
                       <button 
                         onClick={() => navigate(`/task/${task.id}`)}
                         className="font-medium text-slate-800 hover:text-blue-600 hover:underline text-left"
@@ -913,7 +913,7 @@ const Index = () => {
                       <p className="text-sm text-slate-500">Assigned to {task.employeeName}</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-shrink-0">
                     <Badge variant="secondary">
                       {task.category}
                     </Badge>
@@ -932,8 +932,10 @@ const Index = () => {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       <div className="flex min-h-screen w-full">
         <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
-        <main className="flex-1 p-8" style={{ marginLeft: '256px' }}>
-          {renderContent()}
+        <main className="flex-1 p-6 lg:p-8" style={{ marginLeft: '256px' }}>
+          <div className="max-w-full">
+            {renderContent()}
+          </div>
         </main>
       </div>
     </div>

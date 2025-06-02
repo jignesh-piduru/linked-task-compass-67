@@ -46,9 +46,9 @@ const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
   };
 
   return (
-    <div className="w-64 bg-gradient-to-b from-white to-slate-50 border-r border-slate-200/60 shadow-xl flex flex-col backdrop-blur-sm fixed left-0 top-0 h-screen">
+    <div className="w-64 bg-gradient-to-b from-white to-slate-50 border-r border-slate-200/60 shadow-xl flex flex-col backdrop-blur-sm fixed left-0 top-0 h-screen z-40">
       {/* Header */}
-      <div className="p-4 border-b border-slate-200/60 bg-gradient-to-r from-blue-50 to-indigo-50">
+      <div className="p-6 border-b border-slate-200/60 bg-gradient-to-r from-blue-50 to-indigo-50">
         <div className="flex items-center justify-center">
           <h2 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
             TaskFlow
@@ -57,7 +57,7 @@ const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 p-3 overflow-y-auto">
+      <nav className="flex-1 p-4 overflow-y-auto">
         <div className="space-y-2">
           {menuItems.map((item) => {
             const isActive = activeTab === item.id || 
@@ -69,18 +69,18 @@ const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
                   variant="ghost"
                   onClick={item.hasSubmenu ? handleTasksClick : () => onTabChange(item.id)}
                   className={cn(
-                    "w-full justify-start transition-all duration-300 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 hover:text-blue-700 hover:shadow-md rounded-xl px-4 py-3",
+                    "w-full justify-start transition-all duration-300 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 hover:text-blue-700 hover:shadow-md rounded-xl px-4 py-3 h-auto",
                     isActive && "bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-700 shadow-lg border border-blue-200/50"
                   )}
                 >
                   <item.icon className={cn(
-                    "h-5 w-5 transition-colors duration-200 mr-3", 
+                    "h-5 w-5 transition-colors duration-200 mr-3 flex-shrink-0", 
                     isActive ? "text-blue-600" : ""
                   )} />
                   <span className="flex-1 text-left font-medium">{item.label}</span>
                   {item.hasSubmenu && (
                     <ChevronDown className={cn(
-                      "h-4 w-4 transition-transform duration-300",
+                      "h-4 w-4 transition-transform duration-300 flex-shrink-0",
                       tasksExpanded ? "rotate-180" : ""
                     )} />
                   )}
@@ -95,11 +95,11 @@ const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
                         variant="ghost"
                         onClick={() => onTabChange(subItem.id)}
                         className={cn(
-                          "w-full justify-start text-sm transition-all duration-300 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 hover:text-blue-700 hover:shadow-sm rounded-lg py-2",
+                          "w-full justify-start text-sm transition-all duration-300 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 hover:text-blue-700 hover:shadow-sm rounded-lg py-2 px-3 h-auto",
                           activeTab === subItem.id && "bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-700 shadow-sm border border-blue-100"
                         )}
                       >
-                        <subItem.icon className="h-4 w-4 mr-3 text-blue-500" />
+                        <subItem.icon className="h-4 w-4 mr-3 text-blue-500 flex-shrink-0" />
                         <span className="font-medium">{subItem.label}</span>
                       </Button>
                     ))}
