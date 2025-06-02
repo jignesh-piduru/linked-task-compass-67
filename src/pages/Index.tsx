@@ -348,16 +348,21 @@ const Index = () => {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <TaskForm 
-                onSubmit={handleAddTask} 
-                employees={employees}
-                onClose={() => {}}
-              />
+              <Button 
+                onClick={() => navigate('/add-task')}
+                className="h-16 hover:bg-blue-50 bg-blue-600 hover:bg-blue-700 text-white"
+              >
+                <Plus className="mr-2 h-5 w-5" />
+                Add Task
+              </Button>
 
-              <EmployeeForm 
-                onSubmit={handleAddEmployee}
-                onClose={() => {}}
-              />
+              <Button 
+                onClick={() => navigate('/add-employee')}
+                className="h-16 hover:bg-blue-50 bg-blue-600 hover:bg-blue-700 text-white"
+              >
+                <Plus className="mr-2 h-5 w-5" />
+                Add Employee
+              </Button>
             </div>
           </CardContent>
         </Card>

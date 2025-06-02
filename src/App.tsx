@@ -8,6 +8,8 @@ import Index from "./pages/Index";
 import UserProfile from "./pages/UserProfile";
 import TaskDetails from "./pages/TaskDetails";
 import Analytics from "./pages/Analytics";
+import AddTask from "./pages/AddTask";
+import AddEmployee from "./pages/AddEmployee";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -23,6 +25,8 @@ const App = () => (
           <Route path="/user/:userId" element={<UserProfile />} />
           <Route path="/task/:taskId" element={<TaskDetails />} />
           <Route path="/analytics" element={<Analytics />} />
+          <Route path="/add-task" element={<AddTask />} />
+          <Route path="/add-employee" element={<AddEmployee />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
