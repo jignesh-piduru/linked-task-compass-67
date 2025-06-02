@@ -22,13 +22,15 @@ interface TasksTableProps {
   employees: Employee[];
   onUpdate: (task: Task) => void;
   onDelete: (taskId: string) => void;
+  isCompletedTasks?: boolean;
 }
 
 const TasksTable: React.FC<TasksTableProps> = ({ 
   tasks, 
   employees, 
   onUpdate, 
-  onDelete 
+  onDelete,
+  isCompletedTasks = false
 }) => {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const isMobile = useIsMobile();
@@ -94,9 +96,13 @@ const TasksTable: React.FC<TasksTableProps> = ({
 
   // Mobile card view
   if (isMobile) {
+    const containerClass = isCompletedTasks 
+      ? "space-y-4 max-h-[500px] overflow-y-auto scroll-smooth"
+      : "space-y-4";
+
     return (
       <>
-        <div className="space-y-4">
+        <div className={containerClass}>
           {tasks.map((task) => (
             <Card key={task.id} className="shadow-sm border border-gray-200">
               <CardContent className="p-4">
@@ -200,13 +206,21 @@ const TasksTable: React.FC<TasksTableProps> = ({
   }
 
   // Desktop table view
+  const tableContainerClass = isCompletedTasks 
+    ? "bg-white rounded-lg shadow-sm border border-gray-200 max-h-[500px] overflow-auto scroll-smooth"
+    : "bg-white rounded-lg shadow-sm border border-gray-200";
+
+  const headerClass = isCompletedTasks
+    ? "bg-gray-50 border-b border-gray-200 sticky top-0 z-10"
+    : "bg-gray-50 border-b border-gray-200";
+
   return (
     <>
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-        <ScrollArea className="w-full">
+      <div className={tableContainerClass}>
+        <div className="overflow-x-auto">
           <Table className="min-w-[1200px]">
             <TableHeader>
-              <TableRow className="bg-gray-50 border-b border-gray-200">
+              <TableRow className={headerClass}>
                 <TableHead className="font-semibold text-gray-700 px-6 py-4 text-left w-32">Employee</TableHead>
                 <TableHead className="font-semibold text-gray-700 px-6 py-4 text-left min-w-80">Task Name</TableHead>
                 <TableHead className="font-semibold text-gray-700 px-6 py-4 text-left w-32">Category</TableHead>
@@ -312,10 +326,9 @@ const TasksTable: React.FC<TasksTableProps> = ({
               ))}
             </TableBody>
           </Table>
-          <ScrollBar orientation="horizontal" />
-        </ScrollArea>
+        </div>
         
-        {tasks.length > 0 && (
+        {tasks.length > 0 && !isCompletedTasks && (
           <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
             <p className="text-sm text-gray-600">
               Showing 1 to {tasks.length} of {tasks.length} records
