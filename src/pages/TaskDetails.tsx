@@ -1,9 +1,8 @@
-
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Calendar, User, Clock, ExternalLink, Edit, Trash2 } from 'lucide-react';
+import { ArrowLeft, Calendar, User, Clock, ExternalLink, Edit, Trash2, CheckCircle } from 'lucide-react';
 
 // Enhanced mock data matching the main application
 const mockTasks = [
