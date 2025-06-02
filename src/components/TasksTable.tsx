@@ -20,6 +20,7 @@ interface TasksTableProps {
   employees: Employee[];
   onUpdate: (task: Task) => void;
   onDelete: (taskId: string) => void;
+  onCreate?: () => void;
   isCompletedTasks?: boolean;
 }
 
@@ -28,10 +29,27 @@ const TasksTable: React.FC<TasksTableProps> = ({
   employees, 
   onUpdate, 
   onDelete,
+  onCreate,
   isCompletedTasks = false
 }) => {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
   const isMobile = useIsMobile();
+
+  const handleEdit = (task: Task) => {
+    setEditingTask(task);
+    setSelectedTask(task);
+  };
+
+  const handleCloseModal = () => {
+    setSelectedTask(null);
+    setEditingTask(null);
+  };
+
+  const handleTaskUpdate = (updatedTask: Task) => {
+    onUpdate(updatedTask);
+    handleCloseModal();
+  };
 
   // Mobile view
   if (isMobile) {
@@ -48,6 +66,7 @@ const TasksTable: React.FC<TasksTableProps> = ({
               task={task}
               onView={setSelectedTask}
               onDelete={onDelete}
+              onEdit={handleEdit}
             />
           ))}
         </div>
@@ -55,9 +74,9 @@ const TasksTable: React.FC<TasksTableProps> = ({
         <TaskDetailModal
           task={selectedTask}
           isOpen={!!selectedTask}
-          onClose={() => setSelectedTask(null)}
+          onClose={handleCloseModal}
           employees={employees}
-          onUpdate={onUpdate}
+          onUpdate={handleTaskUpdate}
         />
       </>
     );
@@ -95,6 +114,7 @@ const TasksTable: React.FC<TasksTableProps> = ({
                     index={index}
                     onView={setSelectedTask}
                     onDelete={onDelete}
+                    onEdit={handleEdit}
                   />
                 ))}
               </TableBody>
@@ -116,9 +136,9 @@ const TasksTable: React.FC<TasksTableProps> = ({
       <TaskDetailModal
         task={selectedTask}
         isOpen={!!selectedTask}
-        onClose={() => setSelectedTask(null)}
+        onClose={handleCloseModal}
         employees={employees}
-        onUpdate={onUpdate}
+        onUpdate={handleTaskUpdate}
       />
     </>
   );

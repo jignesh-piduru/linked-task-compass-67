@@ -5,15 +5,19 @@ import { Badge } from '@/components/ui/badge';
 import { TableCell, TableRow } from '@/components/ui/table';
 import { Edit, ExternalLink, Eye, Trash2 } from 'lucide-react';
 import { Task } from '@/types/Task';
+import { useNavigate } from 'react-router-dom';
 
 interface TaskTableRowProps {
   task: Task;
   index: number;
   onView: (task: Task) => void;
   onDelete: (taskId: string) => void;
+  onEdit?: (task: Task) => void;
 }
 
-const TaskTableRow: React.FC<TaskTableRowProps> = ({ task, index, onView, onDelete }) => {
+const TaskTableRow: React.FC<TaskTableRowProps> = ({ task, index, onView, onDelete, onEdit }) => {
+  const navigate = useNavigate();
+
   const formatDate = (dateString: string) => {
     if (!dateString) return '-';
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -73,6 +77,20 @@ const TaskTableRow: React.FC<TaskTableRowProps> = ({ task, index, onView, onDele
     }
   };
 
+  const handleEdit = () => {
+    if (onEdit) {
+      onEdit(task);
+    } else {
+      console.log('Edit functionality not implemented yet');
+    }
+  };
+
+  const handleEmployeeClick = () => {
+    // Navigate to employee profile using employee name as URL parameter
+    const employeeUrlName = task.employeeName.toLowerCase().replace(/\s+/g, '-');
+    navigate(`/user/${employeeUrlName}`);
+  };
+
   return (
     <TableRow 
       className={`
@@ -81,9 +99,12 @@ const TaskTableRow: React.FC<TaskTableRowProps> = ({ task, index, onView, onDele
       `}
     >
       <TableCell className="px-6 py-4">
-        <div className="font-semibold text-gray-900">
+        <button
+          onClick={handleEmployeeClick}
+          className="font-semibold text-blue-600 hover:text-blue-800 hover:underline transition-colors cursor-pointer text-left"
+        >
           {task.employeeName}
-        </div>
+        </button>
       </TableCell>
       <TableCell className="px-6 py-4">
         <div className="max-w-xs">
@@ -147,13 +168,16 @@ const TaskTableRow: React.FC<TaskTableRowProps> = ({ task, index, onView, onDele
             size="sm"
             onClick={() => onView(task)}
             className="h-8 w-8 p-0 text-blue-600 hover:bg-blue-100 hover:text-blue-700 rounded-full"
+            title="View Task"
           >
             <Eye className="h-4 w-4" />
           </Button>
           <Button
             variant="ghost"
             size="sm"
+            onClick={handleEdit}
             className="h-8 w-8 p-0 text-gray-600 hover:bg-gray-100 hover:text-gray-700 rounded-full"
+            title="Edit Task"
           >
             <Edit className="h-4 w-4" />
           </Button>
@@ -162,6 +186,7 @@ const TaskTableRow: React.FC<TaskTableRowProps> = ({ task, index, onView, onDele
             size="sm"
             onClick={handleDelete}
             className="h-8 w-8 p-0 text-red-600 hover:bg-red-100 hover:text-red-700 rounded-full"
+            title="Delete Task"
           >
             <Trash2 className="h-4 w-4" />
           </Button>

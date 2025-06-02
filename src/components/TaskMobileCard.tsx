@@ -3,16 +3,20 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { ExternalLink, Eye, Trash2 } from 'lucide-react';
+import { ExternalLink, Eye, Trash2, Edit } from 'lucide-react';
 import { Task } from '@/types/Task';
+import { useNavigate } from 'react-router-dom';
 
 interface TaskMobileCardProps {
   task: Task;
   onView: (task: Task) => void;
   onDelete: (taskId: string) => void;
+  onEdit?: (task: Task) => void;
 }
 
-const TaskMobileCard: React.FC<TaskMobileCardProps> = ({ task, onView, onDelete }) => {
+const TaskMobileCard: React.FC<TaskMobileCardProps> = ({ task, onView, onDelete, onEdit }) => {
+  const navigate = useNavigate();
+
   const formatDate = (dateString: string) => {
     if (!dateString) return '-';
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -68,6 +72,20 @@ const TaskMobileCard: React.FC<TaskMobileCardProps> = ({ task, onView, onDelete 
     }
   };
 
+  const handleEdit = () => {
+    if (onEdit) {
+      onEdit(task);
+    } else {
+      console.log('Edit functionality not implemented yet');
+    }
+  };
+
+  const handleEmployeeClick = () => {
+    // Navigate to employee profile using employee name as URL parameter
+    const employeeUrlName = task.employeeName.toLowerCase().replace(/\s+/g, '-');
+    navigate(`/user/${employeeUrlName}`);
+  };
+
   return (
     <Card className="shadow-md border border-gray-200 bg-white hover:shadow-lg transition-shadow duration-200">
       <CardContent className="p-4">
@@ -87,14 +105,25 @@ const TaskMobileCard: React.FC<TaskMobileCardProps> = ({ task, onView, onDelete 
                 size="sm"
                 onClick={() => onView(task)}
                 className="h-8 w-8 p-0 text-blue-600 hover:bg-blue-50 hover:text-blue-700 rounded-full"
+                title="View Task"
               >
                 <Eye className="h-4 w-4" />
               </Button>
               <Button
                 variant="ghost"
                 size="sm"
+                onClick={handleEdit}
+                className="h-8 w-8 p-0 text-gray-600 hover:bg-gray-50 hover:text-gray-700 rounded-full"
+                title="Edit Task"
+              >
+                <Edit className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={handleDelete}
                 className="h-8 w-8 p-0 text-red-600 hover:bg-red-50 hover:text-red-700 rounded-full"
+                title="Delete Task"
               >
                 <Trash2 className="h-4 w-4" />
               </Button>
@@ -109,7 +138,12 @@ const TaskMobileCard: React.FC<TaskMobileCardProps> = ({ task, onView, onDelete 
           <div className="text-xs text-gray-600 space-y-1">
             <div className="flex justify-between">
               <span className="font-medium">Employee:</span>
-              <span>{task.employeeName}</span>
+              <button
+                onClick={handleEmployeeClick}
+                className="text-blue-600 hover:text-blue-800 hover:underline transition-colors cursor-pointer font-medium"
+              >
+                {task.employeeName}
+              </button>
             </div>
             <div className="flex justify-between">
               <span className="font-medium">Start:</span>
