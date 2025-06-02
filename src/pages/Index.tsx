@@ -407,134 +407,7 @@ const Index = () => {
         <div className="space-y-6">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <h2 className="text-2xl font-bold text-slate-800">Employee Management</h2>
-            <Dialog open={showEmployeeDialog} onOpenChange={setShowEmployeeDialog}>
-              <DialogTrigger asChild>
-                <Button className="bg-blue-600 hover:bg-blue-700 text-white w-full sm:w-auto">
-                  <Plus className="mr-2 h-4 w-4" />
-                  Add Employee
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto mx-4">
-                <DialogHeader>
-                  <DialogTitle className="text-2xl font-bold text-gray-900">Add New Employee</DialogTitle>
-                  <DialogDescription>
-                    Fill in the employee information below to add them to your team.
-                  </DialogDescription>
-                </DialogHeader>
-                
-                <form onSubmit={handleEmployeeSubmit} className="space-y-6 mt-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="name">Full Name</Label>
-                    <Input
-                      id="name"
-                      value={employeeFormData.name}
-                      onChange={(e) => handleEmployeeInputChange('name', e.target.value)}
-                      required
-                      placeholder="Enter employee name"
-                      className="h-12"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      value={employeeFormData.email}
-                      onChange={(e) => handleEmployeeInputChange('email', e.target.value)}
-                      required
-                      placeholder="Enter email address"
-                      className="h-12"
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <Label htmlFor="department">Department</Label>
-                      <Input
-                        id="department"
-                        value={employeeFormData.department}
-                        onChange={(e) => handleEmployeeInputChange('department', e.target.value)}
-                        required
-                        placeholder="Enter department"
-                        className="h-12"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="position">Position</Label>
-                      <Input
-                        id="position"
-                        value={employeeFormData.position}
-                        onChange={(e) => handleEmployeeInputChange('position', e.target.value)}
-                        required
-                        placeholder="Enter job position"
-                        className="h-12"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <Label htmlFor="status">Status</Label>
-                      <Select value={employeeFormData.status} onValueChange={(value) => handleEmployeeInputChange('status', value)}>
-                        <SelectTrigger className="h-12">
-                          <SelectValue placeholder="Select status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="active">Active</SelectItem>
-                          <SelectItem value="inactive">Inactive</SelectItem>
-                          <SelectItem value="on-leave">On Leave</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="role">Role</Label>
-                      <Select value={employeeFormData.role} onValueChange={(value) => handleEmployeeInputChange('role', value)}>
-                        <SelectTrigger className="h-12">
-                          <SelectValue placeholder="Select role" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="admin">Admin</SelectItem>
-                          <SelectItem value="manager">Manager</SelectItem>
-                          <SelectItem value="employee">Employee</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="createdDate">Created Date</Label>
-                    <Input
-                      id="createdDate"
-                      type="date"
-                      value={employeeFormData.createdDate}
-                      onChange={(e) => handleEmployeeInputChange('createdDate', e.target.value)}
-                      required
-                      className="h-12"
-                    />
-                  </div>
-
-                  <div className="pt-6 flex gap-3">
-                    <Button
-                      type="submit"
-                      className="flex-1 bg-blue-600 hover:bg-blue-700 text-white h-12 text-lg font-medium"
-                    >
-                      Add Employee
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => setShowEmployeeDialog(false)}
-                      className="flex-1 h-12"
-                    >
-                      Cancel
-                    </Button>
-                  </div>
-                </form>
-              </DialogContent>
-            </Dialog>
+            <EmployeeForm onSubmit={handleAddEmployee} onClose={() => setShowEmployeeDialog(false)} />
           </div>
 
           <div className="grid gap-4">
@@ -621,144 +494,7 @@ const Index = () => {
             <h2 className="text-2xl font-bold text-slate-800">
               {tabTitles[activeTab as keyof typeof tabTitles]}
             </h2>
-            <Dialog open={showTaskDialog} onOpenChange={setShowTaskDialog}>
-              <DialogTrigger asChild>
-                <Button className="bg-blue-600 hover:bg-blue-700 text-white w-full sm:w-auto">
-                  <Plus className="mr-2 h-4 w-4" />
-                  Add Task
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto mx-4">
-                <DialogHeader>
-                  <DialogTitle className="text-2xl font-bold text-gray-900">Create New Task</DialogTitle>
-                  <DialogDescription>
-                    Fill in the task details below to assign work to your team.
-                  </DialogDescription>
-                </DialogHeader>
-
-                <form onSubmit={handleTaskSubmit} className="space-y-6 mt-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <Label htmlFor="employeeName">Employee</Label>
-                      <Select value={taskFormData.employeeName} onValueChange={(value) => handleTaskInputChange('employeeName', value)}>
-                        <SelectTrigger className="h-12">
-                          <SelectValue placeholder="Select employee" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {employees.map((employee) => (
-                            <SelectItem key={employee.id} value={employee.name}>
-                              {employee.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="taskName">Task Name</Label>
-                      <Input
-                        id="taskName"
-                        value={taskFormData.taskName}
-                        onChange={(e) => handleTaskInputChange('taskName', e.target.value)}
-                        required
-                        placeholder="Enter task name"
-                        className="h-12"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="category">Category</Label>
-                    <Select value={taskFormData.category} onValueChange={(value) => handleTaskInputChange('category', value)}>
-                      <SelectTrigger className="h-12">
-                        <SelectValue placeholder="Select category" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Product">Product</SelectItem>
-                        <SelectItem value="R&D">R&D</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="description">Description</Label>
-                    <Textarea
-                      id="description"
-                      value={taskFormData.description}
-                      onChange={(e) => handleTaskInputChange('description', e.target.value)}
-                      required
-                      placeholder="Enter task description"
-                      rows={4}
-                      className="resize-none"
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="space-y-2">
-                      <Label htmlFor="startDate">Start Date</Label>
-                      <Input
-                        id="startDate"
-                        type="date"
-                        value={taskFormData.startDate}
-                        onChange={(e) => handleTaskInputChange('startDate', e.target.value)}
-                        required
-                        className="h-12"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="estimatedEndDate">Estimated End Date</Label>
-                      <Input
-                        id="estimatedEndDate"
-                        type="date"
-                        value={taskFormData.estimatedEndDate}
-                        onChange={(e) => handleTaskInputChange('estimatedEndDate', e.target.value)}
-                        required
-                        min={taskFormData.startDate}
-                        className="h-12"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="actualEndDate">Actual End Date</Label>
-                      <Input
-                        id="actualEndDate"
-                        type="date"
-                        value={taskFormData.actualEndDate}
-                        onChange={(e) => handleTaskInputChange('actualEndDate', e.target.value)}
-                        min={taskFormData.startDate}
-                        className="h-12"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Tool Links</Label>
-                    <ToolLinkManager
-                      toolLinks={taskFormData.toolLinks}
-                      onChange={(toolLinks) => handleTaskInputChange('toolLinks', toolLinks)}
-                    />
-                  </div>
-
-                  <div className="pt-6 flex gap-3">
-                    <Button
-                      type="submit"
-                      className="flex-1 bg-blue-600 hover:bg-blue-700 text-white h-12 text-lg font-medium"
-                    >
-                      Create Task
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => setShowTaskDialog(false)}
-                      className="flex-1 h-12"
-                    >
-                      Cancel
-                    </Button>
-                  </div>
-                </form>
-              </DialogContent>
-            </Dialog>
+            <TaskForm task={undefined} employees={employees} onSubmit={handleAddTask} onClose={() => setShowTaskDialog(false)} />
           </div>
 
           {filteredTasks.length > 0 ? (
@@ -800,12 +536,16 @@ const Index = () => {
     // Dashboard content
     return (
       <div className="space-y-8">
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
               TaskFlow Dashboard
             </h1>
             <p className="text-slate-600 mt-1 text-sm sm:text-base">Welcome back! Here's what's happening with your projects today.</p>
+          </div>
+          <div className="flex gap-3">
+            <TaskForm task={undefined} employees={employees} onSubmit={handleAddTask} onClose={() => setShowTaskDialog(false)} />
+            <EmployeeForm onSubmit={handleAddEmployee} onClose={() => setShowEmployeeDialog(false)} />
           </div>
         </div>
 
@@ -875,36 +615,6 @@ const Index = () => {
             </CardContent>
           </Card>
         </div>
-
-        <Card className="shadow-xl">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Zap className="h-5 w-5 text-yellow-500" />
-              Quick Actions
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <Dialog open={showTaskDialog} onOpenChange={setShowTaskDialog}>
-                <DialogTrigger asChild>
-                  <Button className="h-16 hover:bg-blue-50 bg-blue-600 hover:bg-blue-700 text-white">
-                    <Plus className="mr-2 h-5 w-5" />
-                    Add Task
-                  </Button>
-                </DialogTrigger>
-              </Dialog>
-
-              <Dialog open={showEmployeeDialog} onOpenChange={setShowEmployeeDialog}>
-                <DialogTrigger asChild>
-                  <Button className="h-16 hover:bg-blue-50 bg-blue-600 hover:bg-blue-700 text-white">
-                    <Plus className="mr-2 h-5 w-5" />
-                    Add Employee
-                  </Button>
-                </DialogTrigger>
-              </Dialog>
-            </div>
-          </CardContent>
-        </Card>
 
         <Card className="shadow-xl">
           <CardHeader>
