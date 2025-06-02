@@ -1,9 +1,10 @@
+
 import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
-import { Plus, Filter, Edit, Trash2, Users, Download, Upload } from 'lucide-react';
+import { Plus, Filter, Edit, Trash2, Users, Download, Upload, Calendar as CalendarIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import TaskForm from '@/components/TaskForm';
@@ -766,7 +767,7 @@ const Index = () => {
         </div>
         <div className="bg-white rounded-xl shadow-lg border border-slate-200 p-8">
           <div className="text-center py-12">
-            <Calendar className="mx-auto h-12 w-12 text-slate-400 mb-4" />
+            <CalendarIcon className="mx-auto h-12 w-12 text-slate-400 mb-4" />
             <h3 className="text-lg font-medium text-slate-900 mb-2">Calendar View</h3>
             <p className="text-slate-600">Calendar functionality coming soon</p>
           </div>
