@@ -61,32 +61,36 @@ const TasksTable: React.FC<TasksTableProps> = ({
     );
   }
 
-  // Desktop view
+  // Desktop view with contained scrolling
   return (
     <>
-      <div className="bg-white rounded-lg shadow-lg border border-gray-200 h-[calc(100vh-280px)] flex flex-col">
+      <div className="bg-white rounded-lg shadow-lg border border-gray-200 h-[calc(100vh-280px)] flex flex-col overflow-hidden">
         {/* Fixed Header */}
-        <div className="flex-shrink-0 border-b border-gray-200">
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-gray-50 border-b border-gray-200">
-                <TableHead className="font-bold text-gray-800 px-6 py-4 text-left w-32">Employee</TableHead>
-                <TableHead className="font-bold text-gray-800 px-6 py-4 text-left min-w-80">Task Name</TableHead>
-                <TableHead className="font-bold text-gray-800 px-6 py-4 text-left w-32">Category</TableHead>
-                <TableHead className="font-bold text-gray-800 px-6 py-4 text-left w-32">Status</TableHead>
-                <TableHead className="font-bold text-gray-800 px-6 py-4 text-left w-28">Start Date</TableHead>
-                <TableHead className="font-bold text-gray-800 px-6 py-4 text-left w-28">Est. End Date</TableHead>
-                <TableHead className="font-bold text-gray-800 px-6 py-4 text-left w-32">Actual End Date</TableHead>
-                <TableHead className="font-bold text-gray-800 px-6 py-4 text-left w-40">Tool Links</TableHead>
-                <TableHead className="font-bold text-gray-800 px-6 py-4 text-left w-24">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-          </Table>
+        <div className="flex-shrink-0 border-b border-gray-200 bg-gray-50">
+          <div className="overflow-x-auto">
+            <div className="min-w-[1200px]">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-gray-50 border-b border-gray-200">
+                    <TableHead className="font-bold text-gray-800 px-6 py-4 text-left w-32">Employee</TableHead>
+                    <TableHead className="font-bold text-gray-800 px-6 py-4 text-left min-w-80">Task Name</TableHead>
+                    <TableHead className="font-bold text-gray-800 px-6 py-4 text-left w-32">Category</TableHead>
+                    <TableHead className="font-bold text-gray-800 px-6 py-4 text-left w-32">Status</TableHead>
+                    <TableHead className="font-bold text-gray-800 px-6 py-4 text-left w-28">Start Date</TableHead>
+                    <TableHead className="font-bold text-gray-800 px-6 py-4 text-left w-28">Est. End Date</TableHead>
+                    <TableHead className="font-bold text-gray-800 px-6 py-4 text-left w-32">Actual End Date</TableHead>
+                    <TableHead className="font-bold text-gray-800 px-6 py-4 text-left w-40">Tool Links</TableHead>
+                    <TableHead className="font-bold text-gray-800 px-6 py-4 text-left w-24">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+              </Table>
+            </div>
+          </div>
         </div>
 
-        {/* Scrollable Content */}
+        {/* Scrollable Content Container */}
         <div className="flex-1 overflow-hidden">
-          <ScrollArea className="h-full w-full">
+          <div className="h-full overflow-x-auto overflow-y-auto">
             <div className="min-w-[1200px]">
               <Table>
                 <TableBody>
@@ -102,9 +106,7 @@ const TasksTable: React.FC<TasksTableProps> = ({
                 </TableBody>
               </Table>
             </div>
-            <ScrollBar orientation="horizontal" className="bg-gray-200" />
-            <ScrollBar orientation="vertical" className="bg-gray-200" />
-          </ScrollArea>
+          </div>
         </div>
         
         {/* Fixed Footer */}
