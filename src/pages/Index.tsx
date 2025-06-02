@@ -37,6 +37,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import TaskCard from '@/components/TaskCard';
+import TasksTable from '@/components/TasksTable';
 import TaskForm from '@/components/TaskForm';
 import EmployeeForm from '@/components/EmployeeForm';
 import Sidebar from '@/components/Sidebar';
@@ -746,29 +747,25 @@ const Index = () => {
             </Dialog>
           </div>
 
-          <div className="grid gap-4">
-            {filteredTasks.map((task) => (
-              <TaskCard 
-                key={task.id} 
-                task={task} 
-                employees={employees}
-                onUpdate={handleTaskUpdate}
-                onDelete={handleTaskDelete}
-              />
-            ))}
-            {filteredTasks.length === 0 && (
-              <Card className="p-8 text-center">
-                <p className="text-slate-500">No tasks found for this category.</p>
-                <Button 
-                  onClick={() => setShowTaskDialog(true)}
-                  className="mt-4 bg-blue-600 hover:bg-blue-700 text-white"
-                >
-                  <Plus className="mr-2 h-4 w-4" />
-                  Create Your First Task
-                </Button>
-              </Card>
-            )}
-          </div>
+          <TasksTable 
+            tasks={filteredTasks}
+            employees={employees}
+            onUpdate={handleTaskUpdate}
+            onDelete={handleTaskDelete}
+          />
+          
+          {filteredTasks.length === 0 && (
+            <Card className="p-8 text-center">
+              <p className="text-slate-500">No tasks found for this category.</p>
+              <Button 
+                onClick={() => setShowTaskDialog(true)}
+                className="mt-4 bg-blue-600 hover:bg-blue-700 text-white"
+              >
+                <Plus className="mr-2 h-4 w-4" />
+                Create Your First Task
+              </Button>
+            </Card>
+          )}
         </div>
       );
     }
