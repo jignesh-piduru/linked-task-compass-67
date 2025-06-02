@@ -40,6 +40,7 @@ import TaskCard from '@/components/TaskCard';
 import TaskForm from '@/components/TaskForm';
 import EmployeeForm from '@/components/EmployeeForm';
 import Sidebar from '@/components/Sidebar';
+import ToolLinkManager from '@/components/ToolLinkManager';
 import type { Task } from '@/types/Task';
 import type { Employee } from '@/types/Employee';
 
@@ -714,6 +715,14 @@ const Index = () => {
                         className="h-12"
                       />
                     </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Tool Links</Label>
+                    <ToolLinkManager
+                      toolLinks={taskFormData.toolLinks}
+                      onChange={(toolLinks) => handleTaskInputChange('toolLinks', toolLinks)}
+                    />
                   </div>
 
                   <div className="pt-6 flex gap-3">
