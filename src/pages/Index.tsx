@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
-import { Plus, Filter, Edit, Trash2, Users, Download, Upload, BarChart3, TrendingUp, Clock, CheckCircle } from 'lucide-react';
+import { Plus, Filter, Edit, Trash2, Users, Download, Upload, BarChart3, TrendingUp, Clock, CheckCircle, UserPlus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import TaskForm from '@/components/TaskForm';
@@ -123,6 +123,15 @@ const Index = () => {
 
   // Dashboard metrics
   const totalTasks = tasks.length;
+  
+  // Get new employees (hired in the last 30 days)
+  const newEmployees = employees.filter(employee => {
+    const hireDate = new Date(employee.createdDate);
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    return hireDate >= thirtyDaysAgo;
+  });
+
   const inProgressTasks = tasks.filter(task => !task.actualEndDate && new Date(task.estimatedEndDate) >= new Date()).length;
   const completedTasks = tasks.filter(task => task.actualEndDate).length;
   const totalEmployees = employees.length;
@@ -319,7 +328,7 @@ const Index = () => {
       </div>
 
       {/* Premium Dashboard Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
         <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl shadow-lg border border-blue-200/50 p-6 hover:shadow-xl transition-all duration-300">
           <div className="flex items-center justify-between">
             <div>
@@ -341,7 +350,7 @@ const Index = () => {
             <div>
               <p className="text-amber-700 text-sm font-semibold uppercase tracking-wide">In Progress</p>
               <p className="text-3xl font-bold text-amber-900 mt-1">{inProgressTasks}</p>
-              <p className="text-sm text-amber-600 mt-1">{totalEmployees} employees working</p>
+              <p className="text-sm text-amber-600 mt-1">Active tasks</p>
             </div>
             <div className="bg-amber-200 p-3 rounded-full">
               <Clock className="h-6 w-6 text-amber-700" />
@@ -379,6 +388,21 @@ const Index = () => {
           </div>
           <div className="mt-4 flex items-center text-sm text-purple-600">
             <span>Active workforce</span>
+          </div>
+        </div>
+
+        <div className="bg-gradient-to-br from-teal-50 to-teal-100 rounded-2xl shadow-lg border border-teal-200/50 p-6 hover:shadow-xl transition-all duration-300">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-teal-700 text-sm font-semibold uppercase tracking-wide">New Employees</p>
+              <p className="text-3xl font-bold text-teal-900 mt-1">{newEmployees.length}</p>
+            </div>
+            <div className="bg-teal-200 p-3 rounded-full">
+              <UserPlus className="h-6 w-6 text-teal-700" />
+            </div>
+          </div>
+          <div className="mt-4 flex items-center text-sm text-teal-600">
+            <span>Last 30 days</span>
           </div>
         </div>
       </div>
@@ -419,7 +443,16 @@ const Index = () => {
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold text-slate-900">All Tasks</h1>
+          <div className="flex items-center gap-4">
+            <Button 
+              variant="ghost" 
+              onClick={() => setActiveTab('dashboard')}
+              className="hover:bg-blue-50 text-blue-600"
+            >
+              ← Back
+            </Button>
+            <h1 className="text-3xl font-bold text-slate-900">All Tasks</h1>
+          </div>
           <Button onClick={() => setShowTaskForm(true)}>
             <Plus className="mr-2 h-4 w-4" />
             New Task
@@ -500,7 +533,16 @@ const Index = () => {
   const renderTodaysTasks = () => {
     return (
       <div className="space-y-6">
-        <h1 className="text-3xl font-bold text-slate-900">Today's Tasks</h1>
+        <div className="flex items-center gap-4">
+          <Button 
+            variant="ghost" 
+            onClick={() => setActiveTab('dashboard')}
+            className="hover:bg-blue-50 text-blue-600"
+          >
+            ← Back
+          </Button>
+          <h1 className="text-3xl font-bold text-slate-900">Today's Tasks</h1>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {todaysTasks.length > 0 ? (
             todaysTasks.map((task) => (
@@ -526,7 +568,16 @@ const Index = () => {
   const renderCompletedTasks = () => {
     return (
       <div className="space-y-6">
-        <h1 className="text-3xl font-bold text-slate-900">Completed Tasks</h1>
+        <div className="flex items-center gap-4">
+          <Button 
+            variant="ghost" 
+            onClick={() => setActiveTab('dashboard')}
+            className="hover:bg-blue-50 text-blue-600"
+          >
+            ← Back
+          </Button>
+          <h1 className="text-3xl font-bold text-slate-900">Completed Tasks</h1>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {completedTasksData.length > 0 ? (
             completedTasksData.map((task) => (
@@ -552,7 +603,16 @@ const Index = () => {
   const renderFutureTasks = () => {
     return (
       <div className="space-y-6">
-        <h1 className="text-3xl font-bold text-slate-900">Future Tasks</h1>
+        <div className="flex items-center gap-4">
+          <Button 
+            variant="ghost" 
+            onClick={() => setActiveTab('dashboard')}
+            className="hover:bg-blue-50 text-blue-600"
+          >
+            ← Back
+          </Button>
+          <h1 className="text-3xl font-bold text-slate-900">Future Tasks</h1>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {futureTasks.length > 0 ? (
             futureTasks.map((task) => (
@@ -582,7 +642,16 @@ const Index = () => {
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold text-slate-900">Employees</h1>
+          <div className="flex items-center gap-4">
+            <Button 
+              variant="ghost" 
+              onClick={() => setActiveTab('dashboard')}
+              className="hover:bg-blue-50 text-blue-600"
+            >
+              ← Back
+            </Button>
+            <h1 className="text-3xl font-bold text-slate-900">Employees</h1>
+          </div>
           <Button onClick={() => setShowEmployeeForm(true)}>
             <Plus className="mr-2 h-4 w-4" />
             Add Employee
@@ -624,14 +693,21 @@ const Index = () => {
             </TableHeader>
             <TableBody>
               {paginatedEmployees.map((employee) => (
-                <TableRow key={employee.id} className="cursor-pointer hover:bg-slate-50" onClick={() => navigate(`/user/${employee.id}`)}>
-                  <TableCell className="font-medium">{employee.name}</TableCell>
+                <TableRow key={employee.id} className="hover:bg-slate-50">
+                  <TableCell className="font-medium">
+                    <button 
+                      onClick={() => navigate(`/user/${employee.id}`)}
+                      className="text-blue-600 hover:text-blue-800 hover:underline font-medium"
+                    >
+                      {employee.name}
+                    </button>
+                  </TableCell>
                   <TableCell>{employee.position}</TableCell>
                   <TableCell>{employee.department}</TableCell>
                   <TableCell>{employee.email}</TableCell>
                   <TableCell>{employee.createdDate}</TableCell>
                   <TableCell className="text-right">
-                    <div className="flex justify-end gap-2" onClick={(e) => e.stopPropagation()}>
+                    <div className="flex justify-end gap-2">
                       <Button variant="ghost" size="sm" onClick={() => handleEditEmployee(employee)}>
                         <Edit className="h-4 w-4" />
                       </Button>
@@ -687,7 +763,16 @@ const Index = () => {
 
   const renderAnalytics = () => (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold text-slate-900">Analytics</h1>
+      <div className="flex items-center gap-4">
+        <Button 
+          variant="ghost" 
+          onClick={() => setActiveTab('dashboard')}
+          className="hover:bg-blue-50 text-blue-600"
+        >
+          ← Back
+        </Button>
+        <h1 className="text-3xl font-bold text-slate-900">Analytics</h1>
+      </div>
       <div className="bg-white rounded-lg shadow p-8 text-center">
         <p className="text-slate-500">Analytics dashboard coming soon...</p>
       </div>

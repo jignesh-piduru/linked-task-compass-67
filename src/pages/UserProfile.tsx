@@ -48,12 +48,12 @@ const UserProfile = ({ employees = [], tasks = [] }: UserProfileProps) => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
+        {/* Header with Back Button */}
         <div className="mb-6">
           <Button 
             variant="outline" 
             onClick={() => navigate('/')}
-            className="mb-4"
+            className="mb-4 hover:bg-blue-50 text-blue-600"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Dashboard
