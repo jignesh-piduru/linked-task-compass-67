@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -49,7 +48,7 @@ const Index = () => {
       id: '2',
       taskName: 'API Integration',
       description: 'Integrate the new payment API endpoints',
-      category: 'Development',
+      category: 'R&D',
       employeeName: 'Jane Smith',
       startDate: '2024-01-20',
       estimatedEndDate: '2024-02-20',
@@ -78,7 +77,8 @@ const Index = () => {
       email: 'john.doe@company.com',
       department: 'Engineering',
       position: 'Senior Developer',
-      skills: ['React', 'TypeScript', 'Node.js']
+      skills: ['React', 'TypeScript', 'Node.js'],
+      createdDate: '2024-01-01'
     },
     {
       id: '2',
@@ -86,7 +86,8 @@ const Index = () => {
       email: 'jane.smith@company.com',
       department: 'Design',
       position: 'UX Designer',
-      skills: ['Figma', 'Sketch', 'User Research']
+      skills: ['Figma', 'Sketch', 'User Research'],
+      createdDate: '2024-01-02'
     },
     {
       id: '3',
@@ -94,7 +95,8 @@ const Index = () => {
       email: 'mike.johnson@company.com',
       department: 'Engineering',
       position: 'Backend Developer',
-      skills: ['Python', 'PostgreSQL', 'Docker']
+      skills: ['Python', 'PostgreSQL', 'Docker'],
+      createdDate: '2024-01-03'
     }
   ]);
 
@@ -173,10 +175,9 @@ const Index = () => {
         <div className="space-y-6">
           <div className="flex justify-between items-center">
             <h2 className="text-2xl font-bold text-slate-800">Employee Management</h2>
-            <TaskForm 
+            <EmployeeForm 
               onSubmit={handleAddEmployee}
               onClose={() => {}}
-              isEmployee={true}
             />
           </div>
 
@@ -374,23 +375,11 @@ const Index = () => {
                 onSubmit={handleAddTask} 
                 employees={employees}
                 onClose={() => {}}
-                triggerButton={
-                  <Button className="h-16 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700">
-                    <Plus className="mr-2 h-5 w-5" />
-                    Create New Task
-                  </Button>
-                }
               />
 
               <EmployeeForm 
                 onSubmit={handleAddEmployee}
                 onClose={() => {}}
-                triggerButton={
-                  <Button variant="outline" className="h-16 hover:bg-purple-50">
-                    <Users className="mr-2 h-5 w-5" />
-                    Add Employee
-                  </Button>
-                }
               />
 
               <Button 
