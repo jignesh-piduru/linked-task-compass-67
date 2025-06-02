@@ -930,9 +930,9 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
-      <div className="flex w-full">
+      <div className="flex min-h-screen w-full">
         <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
-        <main className="flex-1 ml-64 p-8">
+        <main className="flex-1 p-8" style={{ marginLeft: '256px' }}>
           {renderContent()}
         </main>
       </div>
