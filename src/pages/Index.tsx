@@ -396,16 +396,16 @@ const Index = () => {
     if (activeTab === 'employees') {
       return (
         <div className="space-y-6">
-          <div className="flex justify-between items-center">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <h2 className="text-2xl font-bold text-slate-800">Employee Management</h2>
             <Dialog open={showEmployeeDialog} onOpenChange={setShowEmployeeDialog}>
               <DialogTrigger asChild>
-                <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+                <Button className="bg-blue-600 hover:bg-blue-700 text-white w-full sm:w-auto">
                   <Plus className="mr-2 h-4 w-4" />
                   Add Employee
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto mx-4">
                 <DialogHeader>
                   <DialogTitle className="text-2xl font-bold text-gray-900">Add New Employee</DialogTitle>
                   <DialogDescription>
@@ -531,9 +531,9 @@ const Index = () => {
           <div className="grid gap-4">
             {employees.map((employee) => (
               <Card key={employee.id} className="hover:shadow-lg transition-shadow">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-4">
+                <CardContent className="p-4 sm:p-6">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div className="flex items-center space-x-4 flex-1 min-w-0">
                       <div className="w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center text-white font-semibold flex-shrink-0">
                         {employee.name.split(' ').map(n => n[0]).join('')}
                       </div>
@@ -569,7 +569,7 @@ const Index = () => {
                         </div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2 flex-shrink-0">
+                    <div className="flex items-center gap-2 flex-shrink-0 w-full sm:w-auto justify-end">
                       <Button
                         variant="outline"
                         size="sm"
@@ -608,18 +608,18 @@ const Index = () => {
 
       return (
         <div className="space-y-6">
-          <div className="flex justify-between items-center">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <h2 className="text-2xl font-bold text-slate-800">
               {tabTitles[activeTab as keyof typeof tabTitles]}
             </h2>
             <Dialog open={showTaskDialog} onOpenChange={setShowTaskDialog}>
               <DialogTrigger asChild>
-                <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+                <Button className="bg-blue-600 hover:bg-blue-700 text-white w-full sm:w-auto">
                   <Plus className="mr-2 h-4 w-4" />
                   Add Task
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+              <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto mx-4">
                 <DialogHeader>
                   <DialogTitle className="text-2xl font-bold text-gray-900">Create New Task</DialogTitle>
                   <DialogDescription>
@@ -767,7 +767,7 @@ const Index = () => {
                   <h3 className="text-lg font-medium text-gray-900 mb-2">
                     {activeTab === 'tasks-today' ? 'No tasks scheduled for today' : 'No tasks found'}
                   </h3>
-                  <p className="text-gray-500 mb-4">
+                  <p className="text-gray-500 mb-4 text-sm sm:text-base px-4">
                     {activeTab === 'tasks-today' 
                       ? "You don't have any tasks starting, due, or active today. Great job staying on top of your work!"
                       : `No tasks found for this category.`
@@ -776,7 +776,7 @@ const Index = () => {
                 </div>
                 <Button 
                   onClick={() => setShowTaskDialog(true)}
-                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                  className="bg-blue-600 hover:bg-blue-700 text-white w-full sm:w-auto"
                 >
                   <Plus className="mr-2 h-4 w-4" />
                   {activeTab === 'tasks-today' ? 'Schedule a Task for Today' : 'Create Your First Task'}
@@ -793,14 +793,14 @@ const Index = () => {
       <div className="space-y-8">
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+            <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
               TaskFlow Dashboard
             </h1>
-            <p className="text-slate-600 mt-1">Welcome back! Here's what's happening with your projects today.</p>
+            <p className="text-slate-600 mt-1 text-sm sm:text-base">Welcome back! Here's what's happening with your projects today.</p>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-6">
           <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-xl hover:shadow-2xl transition-all duration-300">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
@@ -875,7 +875,7 @@ const Index = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Dialog open={showTaskDialog} onOpenChange={setShowTaskDialog}>
                 <DialogTrigger asChild>
                   <Button className="h-16 hover:bg-blue-50 bg-blue-600 hover:bg-blue-700 text-white">
@@ -899,7 +899,7 @@ const Index = () => {
 
         <Card className="shadow-xl">
           <CardHeader>
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <CardTitle className="flex items-center gap-2">
                 <Target className="h-5 w-5 text-blue-600" />
                 Recent Tasks
@@ -907,7 +907,7 @@ const Index = () => {
               <Button 
                 variant="outline" 
                 onClick={() => setActiveTab('tasks-all')}
-                className="text-blue-600 hover:bg-blue-50"
+                className="text-blue-600 hover:bg-blue-50 w-full sm:w-auto"
               >
                 View All Tasks
               </Button>
@@ -916,8 +916,8 @@ const Index = () => {
           <CardContent>
             <div className="space-y-4">
               {tasks.slice(0, 3).map((task) => (
-                <div key={task.id} className="flex items-center justify-between p-4 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">
-                  <div className="flex items-center space-x-3">
+                <div key={task.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors gap-4">
+                  <div className="flex items-center space-x-3 flex-1 min-w-0">
                     <div className={`w-3 h-3 rounded-full flex-shrink-0 ${
                       task.actualEndDate ? 'bg-green-500' : 'bg-blue-500'
                     }`} />
@@ -931,7 +931,7 @@ const Index = () => {
                       <p className="text-sm text-slate-500">Assigned to {task.employeeName}</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 flex-shrink-0">
+                  <div className="flex items-center gap-2 flex-shrink-0 w-full sm:w-auto justify-between sm:justify-end">
                     <Badge variant="secondary">
                       {task.category}
                     </Badge>
@@ -950,7 +950,7 @@ const Index = () => {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       <div className="flex min-h-screen w-full">
         <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
-        <main className="flex-1 p-6 lg:p-8" style={{ marginLeft: '256px' }}>
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 ml-0 lg:ml-64">
           <div className="max-w-full">
             {renderContent()}
           </div>
