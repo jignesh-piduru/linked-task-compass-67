@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -19,7 +20,9 @@ import {
   Filter,
   Download,
   Search,
-  Zap
+  Zap,
+  Edit,
+  Trash2
 } from 'lucide-react';
 import TaskCard from '@/components/TaskCard';
 import TaskForm from '@/components/TaskForm';
@@ -34,78 +37,163 @@ const Index = () => {
     {
       id: '1',
       taskName: 'Design System Implementation',
-      description: 'Create a comprehensive design system for the application',
+      description: 'Create a comprehensive design system for the application including components, tokens, and documentation',
       category: 'Product',
-      employeeName: 'John Doe',
+      employeeName: 'Sarah Chen',
       startDate: '2024-01-15',
       estimatedEndDate: '2024-02-15',
       actualEndDate: '',
       toolLinks: [
-        { id: '1', name: 'Figma Design', url: 'https://figma.com/design-system' }
+        { id: '1', name: 'Figma Design System', url: 'https://figma.com/design-system' },
+        { id: '2', name: 'Component Library', url: 'https://storybook.com/components' }
       ]
     },
     {
       id: '2',
-      taskName: 'API Integration',
-      description: 'Integrate the new payment API endpoints',
+      taskName: 'Payment API Integration',
+      description: 'Integrate Stripe payment gateway with error handling and webhook support',
       category: 'R&D',
-      employeeName: 'Jane Smith',
+      employeeName: 'Marcus Johnson',
       startDate: '2024-01-20',
       estimatedEndDate: '2024-02-20',
       actualEndDate: '',
       toolLinks: [
-        { id: '2', name: 'API Documentation', url: 'https://api-docs.example.com' }
+        { id: '2', name: 'Stripe API Docs', url: 'https://stripe.com/docs' },
+        { id: '3', name: 'Testing Webhooks', url: 'https://stripe.com/docs/webhooks' }
       ]
     },
     {
       id: '3',
-      taskName: 'Database Optimization',
-      description: 'Optimize database queries for better performance',
+      taskName: 'Database Performance Optimization',
+      description: 'Optimize database queries and implement proper indexing for better performance',
       category: 'Product',
-      employeeName: 'Mike Johnson',
+      employeeName: 'Elena Rodriguez',
       startDate: '2024-01-10',
       estimatedEndDate: '2024-02-10',
       actualEndDate: '2024-02-08',
-      toolLinks: []
+      toolLinks: [
+        { id: '4', name: 'Performance Monitor', url: 'https://datadog.com/dashboard' }
+      ]
+    },
+    {
+      id: '4',
+      taskName: 'User Authentication System',
+      description: 'Implement secure user authentication with JWT tokens and refresh mechanism',
+      category: 'Product',
+      employeeName: 'David Kim',
+      startDate: '2024-01-25',
+      estimatedEndDate: '2024-02-25',
+      actualEndDate: '',
+      toolLinks: [
+        { id: '5', name: 'Auth0 Setup', url: 'https://auth0.com/docs' }
+      ]
+    },
+    {
+      id: '5',
+      taskName: 'Mobile App Research',
+      description: 'Research and prototype mobile application architecture and user flows',
+      category: 'R&D',
+      employeeName: 'Lisa Wang',
+      startDate: '2024-01-12',
+      estimatedEndDate: '2024-02-28',
+      actualEndDate: '2024-02-26',
+      toolLinks: [
+        { id: '6', name: 'React Native Docs', url: 'https://reactnative.dev' },
+        { id: '7', name: 'Prototype', url: 'https://figma.com/mobile-prototype' }
+      ]
     }
   ]);
 
   const [employees, setEmployees] = useState<Employee[]>([
     {
       id: '1',
-      name: 'John Doe',
-      email: 'john.doe@company.com',
+      name: 'Sarah Chen',
+      email: 'sarah.chen@company.com',
       department: 'Engineering',
-      position: 'Senior Developer',
-      skills: ['React', 'TypeScript', 'Node.js'],
-      createdDate: '2024-01-01',
+      position: 'Senior Frontend Developer',
+      skills: ['React', 'TypeScript', 'Node.js', 'GraphQL', 'AWS'],
+      createdDate: '2023-03-15',
       status: 'active',
       role: 'employee',
-      premiumAccess: false
+      premiumAccess: false,
+      phoneNumber: '+1-555-0123',
+      yearsOfExperience: 5,
+      employmentType: 'Full-time'
     },
     {
       id: '2',
-      name: 'Jane Smith',
-      email: 'jane.smith@company.com',
-      department: 'Design',
-      position: 'UX Designer',
-      skills: ['Figma', 'Sketch', 'User Research'],
-      createdDate: '2024-01-02',
+      name: 'Marcus Johnson',
+      email: 'marcus.johnson@company.com',
+      department: 'Engineering',
+      position: 'Backend Developer',
+      skills: ['Python', 'Django', 'PostgreSQL', 'Docker', 'Kubernetes'],
+      createdDate: '2023-06-20',
       status: 'active',
       role: 'employee',
-      premiumAccess: false
+      premiumAccess: false,
+      phoneNumber: '+1-555-0124',
+      yearsOfExperience: 4,
+      employmentType: 'Full-time'
     },
     {
       id: '3',
-      name: 'Mike Johnson',
-      email: 'mike.johnson@company.com',
+      name: 'Elena Rodriguez',
+      email: 'elena.rodriguez@company.com',
       department: 'Engineering',
-      position: 'Backend Developer',
-      skills: ['Python', 'PostgreSQL', 'Docker'],
-      createdDate: '2024-01-03',
+      position: 'Database Administrator',
+      skills: ['PostgreSQL', 'MongoDB', 'Redis', 'Performance Tuning', 'Data Analytics'],
+      createdDate: '2023-01-10',
+      status: 'active',
+      role: 'manager',
+      premiumAccess: true,
+      phoneNumber: '+1-555-0125',
+      yearsOfExperience: 7,
+      employmentType: 'Full-time'
+    },
+    {
+      id: '4',
+      name: 'David Kim',
+      email: 'david.kim@company.com',
+      department: 'Security',
+      position: 'Security Engineer',
+      skills: ['Cybersecurity', 'Penetration Testing', 'OAuth', 'JWT', 'Encryption'],
+      createdDate: '2023-08-05',
       status: 'active',
       role: 'employee',
-      premiumAccess: false
+      premiumAccess: false,
+      phoneNumber: '+1-555-0126',
+      yearsOfExperience: 6,
+      employmentType: 'Full-time'
+    },
+    {
+      id: '5',
+      name: 'Lisa Wang',
+      email: 'lisa.wang@company.com',
+      department: 'Research & Development',
+      position: 'Mobile Developer',
+      skills: ['React Native', 'Flutter', 'iOS', 'Android', 'UI/UX Design'],
+      createdDate: '2023-11-12',
+      status: 'active',
+      role: 'employee',
+      premiumAccess: false,
+      phoneNumber: '+1-555-0127',
+      yearsOfExperience: 3,
+      employmentType: 'Full-time'
+    },
+    {
+      id: '6',
+      name: 'James Wilson',
+      email: 'james.wilson@company.com',
+      department: 'Design',
+      position: 'UX Designer',
+      skills: ['Figma', 'Sketch', 'User Research', 'Prototyping', 'Accessibility'],
+      createdDate: '2023-04-18',
+      status: 'on-leave',
+      role: 'employee',
+      premiumAccess: false,
+      phoneNumber: '+1-555-0128',
+      yearsOfExperience: 4,
+      employmentType: 'Full-time'
     }
   ]);
 
@@ -154,6 +242,24 @@ const Index = () => {
     });
   };
 
+  const handleEmployeeDelete = (employeeId: string) => {
+    setEmployees(employees.filter(employee => employee.id !== employeeId));
+    toast({
+      title: "Employee removed",
+      description: "Employee has been successfully removed.",
+    });
+  };
+
+  const handleEmployeeUpdate = (updatedEmployee: Employee) => {
+    setEmployees(employees.map(employee => 
+      employee.id === updatedEmployee.id ? updatedEmployee : employee
+    ));
+    toast({
+      title: "Employee updated",
+      description: "Employee has been successfully updated.",
+    });
+  };
+
   const getFilteredTasks = () => {
     const today = new Date().toISOString().split('T')[0];
     
@@ -184,39 +290,73 @@ const Index = () => {
         <div className="space-y-6">
           <div className="flex justify-between items-center">
             <h2 className="text-2xl font-bold text-slate-800">Employee Management</h2>
-            <EmployeeForm 
-              onSubmit={handleAddEmployee}
-              onClose={() => {}}
-            />
+            <Button 
+              onClick={() => navigate('/add-employee')}
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Add Employee
+            </Button>
           </div>
 
           <div className="grid gap-4">
             {employees.map((employee) => (
               <Card key={employee.id} className="hover:shadow-lg transition-shadow">
                 <CardContent className="p-6">
-                  <div className="flex items-center space-x-4">
-                    <div className="w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center text-white font-semibold">
-                      {employee.name.split(' ').map(n => n[0]).join('')}
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between">
-                        <button 
-                          onClick={() => navigate(`/user/${employee.id}`)}
-                          className="text-blue-600 hover:text-blue-800 hover:underline font-medium"
-                        >
-                          {employee.name}
-                        </button>
-                        <Badge variant="secondary">{employee.department}</Badge>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-4">
+                      <div className="w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center text-white font-semibold">
+                        {employee.name.split(' ').map(n => n[0]).join('')}
                       </div>
-                      <p className="text-slate-600 text-sm">{employee.position}</p>
-                      <p className="text-slate-500 text-xs">{employee.email}</p>
-                      <div className="flex flex-wrap gap-1 mt-2">
-                        {employee.skills?.map((skill) => (
-                          <Badge key={skill} variant="outline" className="text-xs">
-                            {skill}
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3">
+                          <button 
+                            onClick={() => navigate(`/user/${employee.id}`)}
+                            className="text-blue-600 hover:text-blue-800 hover:underline font-medium text-lg"
+                          >
+                            {employee.name}
+                          </button>
+                          <Badge variant="secondary">{employee.department}</Badge>
+                          <Badge variant={employee.status === 'active' ? 'default' : 'outline'}>
+                            {employee.status}
                           </Badge>
-                        ))}
+                        </div>
+                        <p className="text-slate-600 text-sm font-medium">{employee.position}</p>
+                        <p className="text-slate-500 text-xs">{employee.email}</p>
+                        {employee.phoneNumber && (
+                          <p className="text-slate-500 text-xs">{employee.phoneNumber}</p>
+                        )}
+                        <div className="flex flex-wrap gap-1 mt-2">
+                          {employee.skills?.slice(0, 5).map((skill) => (
+                            <Badge key={skill} variant="outline" className="text-xs">
+                              {skill}
+                            </Badge>
+                          ))}
+                          {employee.skills && employee.skills.length > 5 && (
+                            <Badge variant="outline" className="text-xs">
+                              +{employee.skills.length - 5} more
+                            </Badge>
+                          )}
+                        </div>
                       </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => navigate(`/user/${employee.id}`)}
+                        className="text-blue-600 hover:bg-blue-50"
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleEmployeeDelete(employee.id)}
+                        className="text-red-600 hover:bg-red-50"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
                     </div>
                   </div>
                 </CardContent>
@@ -243,11 +383,13 @@ const Index = () => {
             <h2 className="text-2xl font-bold text-slate-800">
               {tabTitles[activeTab as keyof typeof tabTitles]}
             </h2>
-            <TaskForm 
-              onSubmit={handleAddTask} 
-              employees={employees}
-              onClose={() => {}}
-            />
+            <Button 
+              onClick={() => navigate('/add-task')}
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Add Task
+            </Button>
           </div>
 
           <div className="grid gap-4">
@@ -263,6 +405,13 @@ const Index = () => {
             {filteredTasks.length === 0 && (
               <Card className="p-8 text-center">
                 <p className="text-slate-500">No tasks found for this category.</p>
+                <Button 
+                  onClick={() => navigate('/add-task')}
+                  className="mt-4 bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  <Plus className="mr-2 h-4 w-4" />
+                  Create Your First Task
+                </Button>
               </Card>
             )}
           </div>
@@ -291,7 +440,7 @@ const Index = () => {
                 <div>
                   <p className="text-blue-100 text-sm">Total Tasks</p>
                   <p className="text-3xl font-bold">{tasks.length}</p>
-                  <p className="text-blue-100 text-xs mt-1">+12% from last month</p>
+                  <p className="text-blue-100 text-xs mt-1">Active projects</p>
                 </div>
                 <BarChart3 className="h-12 w-12 text-blue-200" />
               </div>
@@ -304,7 +453,7 @@ const Index = () => {
                 <div>
                   <p className="text-green-100 text-sm">Completed</p>
                   <p className="text-3xl font-bold">{tasks.filter(t => !!t.actualEndDate).length}</p>
-                  <p className="text-green-100 text-xs mt-1">+8% completion rate</p>
+                  <p className="text-green-100 text-xs mt-1">{Math.round((tasks.filter(t => !!t.actualEndDate).length / tasks.length) * 100)}% completion rate</p>
                 </div>
                 <CheckCircle className="h-12 w-12 text-green-200" />
               </div>
@@ -329,7 +478,7 @@ const Index = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-purple-100 text-sm">Team Members</p>
-                  <p className="text-3xl font-bold">{employees.length}</p>
+                  <p className="text-3xl font-bold">{employees.filter(e => e.status === 'active').length}</p>
                   <p className="text-purple-100 text-xs mt-1">Active workforce</p>
                 </div>
                 <Users className="h-12 w-12 text-purple-200" />
@@ -393,7 +542,12 @@ const Index = () => {
                       task.actualEndDate ? 'bg-green-500' : 'bg-blue-500'
                     }`} />
                     <div>
-                      <h4 className="font-medium text-slate-800">{task.taskName}</h4>
+                      <button 
+                        onClick={() => navigate(`/task/${task.id}`)}
+                        className="font-medium text-slate-800 hover:text-blue-600 hover:underline text-left"
+                      >
+                        {task.taskName}
+                      </button>
                       <p className="text-sm text-slate-500">Assigned to {task.employeeName}</p>
                     </div>
                   </div>
