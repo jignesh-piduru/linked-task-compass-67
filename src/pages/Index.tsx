@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -23,17 +22,24 @@ import {
   Zap,
   Edit,
   Trash2,
-  UserX
+  UserX,
+  Eye,
+  X
 } from 'lucide-react';
 import TaskCard from '@/components/TaskCard';
 import TaskForm from '@/components/TaskForm';
 import EmployeeForm from '@/components/EmployeeForm';
 import Sidebar from '@/components/Sidebar';
+import TaskDetails from '@/components/TaskDetails';
 import type { Task } from '@/types/Task';
 import type { Employee } from '@/types/Employee';
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [showTaskForm, setShowTaskForm] = useState(false);
+  const [showEmployeeForm, setShowEmployeeForm] = useState(false);
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  
   const [tasks, setTasks] = useState<Task[]>([
     {
       id: '1',
@@ -207,6 +213,7 @@ const Index = () => {
       id: Date.now().toString(),
     };
     setTasks([...tasks, newTask]);
+    setShowTaskForm(false);
     toast({
       title: "Task created",
       description: "Your task has been successfully created.",
@@ -219,6 +226,7 @@ const Index = () => {
       id: Date.now().toString(),
     };
     setEmployees([...employees, newEmployee]);
+    setShowEmployeeForm(false);
     toast({
       title: "Employee added",
       description: "New employee has been successfully added.",
@@ -266,11 +274,11 @@ const Index = () => {
     
     switch (activeTab) {
       case 'tasks-today':
-        return tasks.filter(task => task.estimatedEndDate === today);
+        return tasks.filter(task => task.estimatedEndDate === today && !task.actualEndDate);
       case 'tasks-completed':
         return tasks.filter(task => !!task.actualEndDate);
       case 'tasks-future':
-        return tasks.filter(task => task.estimatedEndDate > today);
+        return tasks.filter(task => task.estimatedEndDate > today && !task.actualEndDate);
       case 'tasks-all':
       case 'tasks':
         return tasks;
@@ -279,20 +287,96 @@ const Index = () => {
     }
   };
 
+  const getTodaysTasks = () => {
+    const today = new Date().toISOString().split('T')[0];
+    return tasks.filter(task => task.estimatedEndDate === today && !task.actualEndDate);
+  };
+
   // Navigate to Analytics page when analytics tab is selected
   if (activeTab === 'analytics') {
     navigate('/analytics');
     return null;
   }
 
+  // Show task details overlay
+  if (selectedTask) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+        <div className="flex w-full">
+          <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
+          <main className="flex-1 ml-64 relative">
+            <div className="absolute inset-0 bg-black bg-opacity-50 z-10" onClick={() => setSelectedTask(null)} />
+            <div className="absolute inset-4 bg-white rounded-lg shadow-2xl z-20 overflow-auto">
+              <div className="p-4 border-b flex justify-between items-center">
+                <h2 className="text-xl font-semibold">Task Details</h2>
+                <Button variant="ghost" onClick={() => setSelectedTask(null)}>
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+              <div className="p-6">
+                <TaskDetails task={selectedTask} />
+              </div>
+            </div>
+          </main>
+        </div>
+      </div>
+    );
+  }
+
   const renderContent = () => {
+    // Show task form overlay
+    if (showTaskForm) {
+      return (
+        <div className="relative">
+          <div className="absolute inset-0 bg-black bg-opacity-50 z-10" onClick={() => setShowTaskForm(false)} />
+          <div className="absolute top-8 left-1/2 transform -translate-x-1/2 bg-white rounded-lg shadow-2xl z-20 w-full max-w-2xl max-h-[90vh] overflow-auto">
+            <div className="p-4 border-b flex justify-between items-center">
+              <h2 className="text-xl font-semibold">Add New Task</h2>
+              <Button variant="ghost" onClick={() => setShowTaskForm(false)}>
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+            <div className="p-6">
+              <TaskForm onSubmit={handleAddTask} employees={employees} />
+            </div>
+          </div>
+          {renderMainContent()}
+        </div>
+      );
+    }
+
+    // Show employee form overlay
+    if (showEmployeeForm) {
+      return (
+        <div className="relative">
+          <div className="absolute inset-0 bg-black bg-opacity-50 z-10" onClick={() => setShowEmployeeForm(false)} />
+          <div className="absolute top-8 left-1/2 transform -translate-x-1/2 bg-white rounded-lg shadow-2xl z-20 w-full max-w-2xl max-h-[90vh] overflow-auto">
+            <div className="p-4 border-b flex justify-between items-center">
+              <h2 className="text-xl font-semibold">Add New Employee</h2>
+              <Button variant="ghost" onClick={() => setShowEmployeeForm(false)}>
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+            <div className="p-6">
+              <EmployeeForm onSubmit={handleAddEmployee} />
+            </div>
+          </div>
+          {renderMainContent()}
+        </div>
+      );
+    }
+
+    return renderMainContent();
+  };
+
+  const renderMainContent = () => {
     if (activeTab === 'employees') {
       return (
         <div className="space-y-6">
           <div className="flex justify-between items-center">
             <h2 className="text-2xl font-bold text-slate-800">Employee Management</h2>
             <Button 
-              onClick={() => navigate('/add-employee')}
+              onClick={() => setShowEmployeeForm(true)}
               className="bg-blue-600 hover:bg-blue-700 text-white"
             >
               <Plus className="mr-2 h-4 w-4" />
@@ -385,7 +469,7 @@ const Index = () => {
               {tabTitles[activeTab as keyof typeof tabTitles]}
             </h2>
             <Button 
-              onClick={() => navigate('/add-task')}
+              onClick={() => setShowTaskForm(true)}
               className="bg-blue-600 hover:bg-blue-700 text-white"
             >
               <Plus className="mr-2 h-4 w-4" />
@@ -395,19 +479,53 @@ const Index = () => {
 
           <div className="grid gap-4">
             {filteredTasks.map((task) => (
-              <TaskCard 
-                key={task.id} 
-                task={task} 
-                employees={employees}
-                onUpdate={handleTaskUpdate}
-                onDelete={handleTaskDelete}
-              />
+              <Card key={task.id} className="hover:shadow-lg transition-shadow">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        <h3 className="font-semibold text-lg text-slate-800">{task.taskName}</h3>
+                        <Badge variant="secondary">{task.category}</Badge>
+                        {task.actualEndDate ? (
+                          <Badge variant="default" className="bg-green-600">Completed</Badge>
+                        ) : (
+                          <Badge variant="outline">In Progress</Badge>
+                        )}
+                      </div>
+                      <p className="text-slate-600 mb-2">{task.description}</p>
+                      <div className="flex items-center gap-4 text-sm text-slate-500">
+                        <span>Assigned to: {task.employeeName}</span>
+                        <span>Due: {task.estimatedEndDate}</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setSelectedTask(task)}
+                        className="text-blue-600 hover:bg-blue-50"
+                      >
+                        <Eye className="h-4 w-4 mr-1" />
+                        View
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleTaskDelete(task.id)}
+                        className="text-red-600 hover:bg-red-50"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             ))}
             {filteredTasks.length === 0 && (
               <Card className="p-8 text-center">
                 <p className="text-slate-500">No tasks found for this category.</p>
                 <Button 
-                  onClick={() => navigate('/add-task')}
+                  onClick={() => setShowTaskForm(true)}
                   className="mt-4 bg-blue-600 hover:bg-blue-700 text-white"
                 >
                   <Plus className="mr-2 h-4 w-4" />
@@ -512,7 +630,7 @@ const Index = () => {
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Button 
-                onClick={() => navigate('/add-task')}
+                onClick={() => setShowTaskForm(true)}
                 className="h-16 hover:bg-blue-50 bg-blue-600 hover:bg-blue-700 text-white"
               >
                 <Plus className="mr-2 h-5 w-5" />
@@ -520,7 +638,7 @@ const Index = () => {
               </Button>
 
               <Button 
-                onClick={() => navigate('/add-employee')}
+                onClick={() => setShowEmployeeForm(true)}
                 className="h-16 hover:bg-blue-50 bg-blue-600 hover:bg-blue-700 text-white"
               >
                 <Plus className="mr-2 h-5 w-5" />
@@ -530,26 +648,26 @@ const Index = () => {
           </CardContent>
         </Card>
 
-        {/* Recent Tasks Preview */}
+        {/* Today's Tasks Preview */}
         <Card className="shadow-xl">
           <CardHeader>
             <div className="flex justify-between items-center">
               <CardTitle className="flex items-center gap-2">
                 <Target className="h-5 w-5 text-blue-600" />
-                Recent Tasks
+                Today's Tasks
               </CardTitle>
               <Button 
                 variant="outline" 
-                onClick={() => setActiveTab('tasks-all')}
+                onClick={() => setActiveTab('tasks-today')}
                 className="text-blue-600 hover:bg-blue-50"
               >
-                View All Tasks
+                View All Today's Tasks
               </Button>
             </div>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {tasks.slice(0, 3).map((task) => (
+              {getTodaysTasks().slice(0, 3).map((task) => (
                 <div key={task.id} className="flex items-center justify-between p-4 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">
                   <div className="flex items-center space-x-3">
                     <div className={`w-3 h-3 rounded-full ${
@@ -557,7 +675,7 @@ const Index = () => {
                     }`} />
                     <div>
                       <button 
-                        onClick={() => navigate(`/task/${task.id}`)}
+                        onClick={() => setSelectedTask(task)}
                         className="font-medium text-slate-800 hover:text-blue-600 hover:underline text-left"
                       >
                         {task.taskName}
@@ -566,13 +684,24 @@ const Index = () => {
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setSelectedTask(task)}
+                      className="text-blue-600 hover:bg-blue-50"
+                    >
+                      <Eye className="h-4 w-4 mr-1" />
+                      View
+                    </Button>
                     <Badge variant="secondary">
                       {task.category}
                     </Badge>
-                    <span className="text-sm text-slate-500">{task.estimatedEndDate}</span>
                   </div>
                 </div>
               ))}
+              {getTodaysTasks().length === 0 && (
+                <p className="text-slate-500 text-center py-4">No tasks due today.</p>
+              )}
             </div>
           </CardContent>
         </Card>
