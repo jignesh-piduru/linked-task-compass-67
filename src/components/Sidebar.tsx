@@ -140,7 +140,7 @@ const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
       <div className="p-4 border-t border-slate-200/60 bg-gradient-to-r from-slate-50 to-blue-50">
         {!isCollapsed && (
           <div className="text-xs text-slate-500 animate-fade-in text-center">
-            <div className="font-semibold text-blue-600">TaskFlow Premium</div>
+            <div className="font-semibold text-blue-600">TaskFlow</div>
             <div className="mt-1">© 2024 All Rights Reserved</div>
           </div>
         )}

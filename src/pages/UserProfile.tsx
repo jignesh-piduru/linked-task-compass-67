@@ -1,4 +1,3 @@
-
 import { useParams, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -7,7 +6,6 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { 
   ArrowLeft, 
-  Crown, 
   User, 
   Mail, 
   Calendar, 
@@ -195,12 +193,6 @@ const UserProfile = () => {
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-2">
                   <h1 className="text-3xl font-bold text-slate-900">{employee.name}</h1>
-                  {isPremiumUser && (
-                    <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white">
-                      <Crown className="mr-1 h-3 w-3" />
-                      Premium
-                    </Badge>
-                  )}
                   <Badge variant="secondary" className={
                     employee.status === 'active' ? 'bg-green-100 text-green-800' :
                     employee.status === 'inactive' ? 'bg-red-100 text-red-800' :
