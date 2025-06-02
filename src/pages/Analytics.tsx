@@ -1,4 +1,3 @@
-
 import { BarChart3, TrendingUp, Users, CheckCircle, Clock, ArrowLeft, Download, Filter, Calendar as CalendarIcon, Target, Zap, Globe, AlertTriangle, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -93,7 +92,7 @@ const Analytics = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-8">
       <div className="max-w-7xl mx-auto">
-        {/* Enhanced Header */}
+        {/* Simplified Header */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
             <Button 
@@ -107,47 +106,12 @@ const Analytics = () => {
             <div>
               <div className="flex items-center gap-3">
                 <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                  Premium Analytics Hub
+                  Analytics Hub
                 </h1>
-                <Sparkles className="h-8 w-8 text-yellow-500" />
               </div>
-              <p className="text-slate-600 mt-1">AI-powered insights and predictive analytics</p>
+              <p className="text-slate-600 mt-1">Insights and analytics for your projects</p>
             </div>
           </div>
-          <div className="flex gap-2">
-            <Button variant="outline" className="shadow-sm">
-              <Filter className="mr-2 h-4 w-4" />
-              Advanced Filters
-            </Button>
-            <Button variant="outline" className="shadow-sm">
-              <CalendarIcon className="mr-2 h-4 w-4" />
-              Custom Range
-            </Button>
-            <Button variant="outline" className="shadow-sm">
-              <Download className="mr-2 h-4 w-4" />
-              Export Report
-            </Button>
-            <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 shadow-lg">
-              <Zap className="mr-2 h-4 w-4" />
-              AI Insights
-            </Button>
-          </div>
-        </div>
-
-        {/* Premium Badges */}
-        <div className="flex gap-3 mb-6">
-          <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-4 py-2 shadow-lg">
-            🚀 Premium Analytics Suite
-          </Badge>
-          <Badge className="bg-gradient-to-r from-green-400 to-emerald-500 text-white px-3 py-1">
-            🤖 AI-Powered
-          </Badge>
-          <Badge className="bg-gradient-to-r from-purple-400 to-pink-500 text-white px-3 py-1">
-            📊 Real-time Data
-          </Badge>
-          <Badge className="bg-gradient-to-r from-indigo-400 to-blue-500 text-white px-3 py-1">
-            🔮 Predictive Analytics
-          </Badge>
         </div>
 
         {/* Real-time Metrics Bar */}
@@ -225,7 +189,7 @@ const Analytics = () => {
                 <div>
                   <p className="text-orange-100 text-sm">Innovation Index</p>
                   <p className="text-3xl font-bold">{analyticsData.innovationIndex}%</p>
-                  <p className="text-orange-100 text-xs mt-1">AI-calculated metric</p>
+                  <p className="text-orange-100 text-xs mt-1">Calculated metric</p>
                   <Progress value={76} className="mt-2 bg-orange-400" />
                 </div>
                 <Target className="h-12 w-12 text-orange-200" />
