@@ -22,7 +22,8 @@ import {
   Search,
   Zap,
   Edit,
-  Trash2
+  Trash2,
+  UserX
 } from 'lucide-react';
 import TaskCard from '@/components/TaskCard';
 import TaskForm from '@/components/TaskForm';
@@ -433,7 +434,7 @@ const Index = () => {
         </div>
 
         {/* Enhanced Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
           <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-xl hover:shadow-2xl transition-all duration-300">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
@@ -477,11 +478,24 @@ const Index = () => {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-purple-100 text-sm">Team Members</p>
+                  <p className="text-purple-100 text-sm">Active Employees</p>
                   <p className="text-3xl font-bold">{employees.filter(e => e.status === 'active').length}</p>
-                  <p className="text-purple-100 text-xs mt-1">Active workforce</p>
+                  <p className="text-purple-100 text-xs mt-1">Working team</p>
                 </div>
                 <Users className="h-12 w-12 text-purple-200" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-amber-500 to-orange-600 text-white shadow-xl hover:shadow-2xl transition-all duration-300">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-amber-100 text-sm">On Leave</p>
+                  <p className="text-3xl font-bold">{employees.filter(e => e.status === 'on-leave').length}</p>
+                  <p className="text-amber-100 text-xs mt-1">Away from work</p>
+                </div>
+                <UserX className="h-12 w-12 text-amber-200" />
               </div>
             </CardContent>
           </Card>
