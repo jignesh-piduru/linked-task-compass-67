@@ -1,9 +1,11 @@
+
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { 
   LayoutDashboard, 
   CheckSquare, 
   Users, 
+  BarChart3, 
   ChevronLeft,
   ChevronRight,
   ChevronDown,
@@ -38,6 +40,7 @@ const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
       ]
     },
     { id: 'employees', label: 'Employees', icon: Users },
+    { id: 'analytics', label: 'Analytics', icon: BarChart3 },
   ];
 
   const handleTasksClick = () => {
