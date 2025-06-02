@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -229,7 +228,7 @@ const Index = () => {
   const [employeeFormData, setEmployeeFormData] = useState({
     name: '',
     email: '',
-    department: 'Engineering',
+    department: '',
     position: '',
     createdDate: new Date().toISOString().split('T')[0],
     status: 'active' as 'active' | 'inactive' | 'on-leave',
@@ -344,7 +343,7 @@ const Index = () => {
     setEmployeeFormData({
       name: '',
       email: '',
-      department: 'Engineering',
+      department: '',
       position: '',
       createdDate: new Date().toISOString().split('T')[0],
       status: 'active',
@@ -436,19 +435,14 @@ const Index = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <Label htmlFor="department">Department</Label>
-                      <Select value={employeeFormData.department} onValueChange={(value) => handleEmployeeInputChange('department', value)}>
-                        <SelectTrigger className="h-12">
-                          <SelectValue placeholder="Select department" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Engineering">Engineering</SelectItem>
-                          <SelectItem value="Design">Design</SelectItem>
-                          <SelectItem value="Marketing">Marketing</SelectItem>
-                          <SelectItem value="Sales">Sales</SelectItem>
-                          <SelectItem value="HR">HR</SelectItem>
-                          <SelectItem value="Finance">Finance</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <Input
+                        id="department"
+                        value={employeeFormData.department}
+                        onChange={(e) => handleEmployeeInputChange('department', e.target.value)}
+                        required
+                        placeholder="Enter department"
+                        className="h-12"
+                      />
                     </div>
 
                     <div className="space-y-2">
@@ -492,6 +486,18 @@ const Index = () => {
                         </SelectContent>
                       </Select>
                     </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="createdDate">Created Date</Label>
+                    <Input
+                      id="createdDate"
+                      type="date"
+                      value={employeeFormData.createdDate}
+                      onChange={(e) => handleEmployeeInputChange('createdDate', e.target.value)}
+                      required
+                      className="h-12"
+                    />
                   </div>
 
                   <div className="pt-6 flex gap-3">
