@@ -1,15 +1,15 @@
-
 import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
-import { Plus, Filter, Edit, Trash2, ExternalLink, Users, Download, Upload } from 'lucide-react';
+import { Plus, Filter, Edit, Trash2, Users, Download, Upload } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import TaskForm from '@/components/TaskForm';
 import EmployeeForm from '@/components/EmployeeForm';
+import Sidebar from '@/components/Sidebar';
+import TaskCardPremium from '@/components/TaskCardPremium';
 import { Task } from '@/types/Task';
 import { Employee } from '@/types/Employee';
 import { exportToCSV, handleFileImport, validateEmployeeData, validateTaskData } from '@/utils/csvUtils';
@@ -426,8 +426,334 @@ const Index = () => {
     }
   };
 
+  const handleTaskClick = (task: Task) => {
+    navigate(`/task/${task.id}`);
+  };
+
+  const handleEmployeeNameClick = (employeeName: string) => {
+    const employee = employees.find(emp => emp.name === employeeName);
+    if (employee) {
+      const userSlug = employee.name.toLowerCase().replace(/\s+/g, '-');
+      navigate(`/user/${userSlug}`);
+    }
+  };
+
+  const renderTasksView = () => {
+    const filteredTasks = getFilteredTasks('all');
+    
+    return (
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-2xl font-bold text-slate-900">Tasks</h2>
+            <p className="text-slate-600">Manage your team's tasks and projects</p>
+          </div>
+          <div className="flex gap-3">
+            <Button 
+              onClick={() => taskFileInputRef.current?.click()}
+              variant="outline"
+              size="sm"
+            >
+              <Upload className="mr-2 h-4 w-4" />
+              Import
+            </Button>
+            <Button 
+              onClick={handleTaskExport}
+              variant="outline"
+              size="sm"
+            >
+              <Download className="mr-2 h-4 w-4" />
+              Export
+            </Button>
+            <Button 
+              onClick={() => setIsTaskFormOpen(true)}
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              New Task
+            </Button>
+          </div>
+        </div>
+
+        {/* Filters */}
+        <div className="flex gap-4 items-center">
+          <Input
+            placeholder="Search tasks or employees..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="max-w-sm"
+          />
+          <select
+            value={filterCategory}
+            onChange={(e) => setFilterCategory(e.target.value as any)}
+            className="border border-slate-300 rounded-md px-3 py-2 text-sm"
+          >
+            <option value="all">All Categories</option>
+            <option value="Product">Product</option>
+            <option value="R&D">R&D</option>
+          </select>
+        </div>
+
+        {/* Tasks List */}
+        <div className="space-y-4">
+          {getPaginatedTasks(filteredTasks).map((task) => (
+            <TaskCardPremium
+              key={task.id}
+              task={task}
+              employees={employees}
+              onTaskClick={handleTaskClick}
+              onEmployeeClick={handleEmployeeNameClick}
+              onTaskUpdate={updateTask}
+            />
+          ))}
+        </div>
+
+        {/* Pagination */}
+        {getTotalPages(filteredTasks.length) > 1 && (
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious 
+                  onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                  className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                />
+              </PaginationItem>
+              {Array.from({ length: getTotalPages(filteredTasks.length) }, (_, i) => i + 1).map((page) => (
+                <PaginationItem key={page}>
+                  <PaginationLink
+                    onClick={() => setCurrentPage(page)}
+                    isActive={currentPage === page}
+                    className="cursor-pointer"
+                  >
+                    {page}
+                  </PaginationLink>
+                </PaginationItem>
+              ))}
+              <PaginationItem>
+                <PaginationNext 
+                  onClick={() => setCurrentPage(Math.min(getTotalPages(filteredTasks.length), currentPage + 1))}
+                  className={currentPage === getTotalPages(filteredTasks.length) ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        )}
+      </div>
+    );
+  };
+
+  const renderEmployeesView = () => {
+    const filteredEmployees = getFilteredEmployees();
+    const paginatedEmployees = getPaginatedEmployees(filteredEmployees);
+    const totalPages = getTotalPages(filteredEmployees.length);
+
+    if (filteredEmployees.length === 0) {
+      return (
+        <div className="text-center py-12">
+          <div className="bg-white rounded-2xl p-8 shadow-sm border border-slate-200">
+            <h3 className="text-xl font-semibold text-slate-900 mb-2">
+              No employees found
+            </h3>
+            <p className="text-slate-600 mb-6">
+              {employees.length === 0 
+                ? "Get started by adding your first employee!" 
+                : "Try adjusting your search terms to find employees."}
+            </p>
+            {employees.length === 0 && (
+              <Button 
+                onClick={() => setIsEmployeeFormOpen(true)}
+                className="bg-green-600 hover:bg-green-700"
+              >
+                <Users className="mr-2 h-4 w-4" />
+                Add First Employee
+              </Button>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-200">
+        <div className="px-6 py-4 border-b border-slate-200">
+          <p className="text-sm text-slate-600">
+            Showing {((employeeCurrentPage - 1) * itemsPerPage) + 1} to {Math.min(employeeCurrentPage * itemsPerPage, filteredEmployees.length)} of {filteredEmployees.length} records
+          </p>
+        </div>
+
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Name</TableHead>
+              <TableHead>Email</TableHead>
+              <TableHead>Department</TableHead>
+              <TableHead>Position</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Role</TableHead>
+              <TableHead>Premium</TableHead>
+              <TableHead>Created Date</TableHead>
+              <TableHead>Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {paginatedEmployees.map((employee) => (
+              <TableRow key={employee.id}>
+                <TableCell className="font-medium">
+                  <button
+                    onClick={() => handleUserNameClick(employee)}
+                    className="text-blue-600 hover:text-blue-800 hover:underline font-medium"
+                  >
+                    {employee.name}
+                  </button>
+                </TableCell>
+                <TableCell>{employee.email}</TableCell>
+                <TableCell>
+                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                    {employee.department}
+                  </span>
+                </TableCell>
+                <TableCell>{employee.position}</TableCell>
+                <TableCell>{getEmployeeStatusBadge(employee.status)}</TableCell>
+                <TableCell>{getRoleBadge(employee.role)}</TableCell>
+                <TableCell>
+                  {employee.premiumAccess ? (
+                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                      Premium
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                      Standard
+                    </span>
+                  )}
+                </TableCell>
+                <TableCell>{formatDate(employee.createdDate)}</TableCell>
+                <TableCell>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setEditingEmployee(employee)}
+                    >
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => deleteEmployee(employee.id)}
+                      className="text-red-600 hover:text-red-700"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+
+        {totalPages > 1 && (
+          <div className="px-6 py-4 border-t border-slate-200">
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious 
+                    onClick={() => setEmployeeCurrentPage(Math.max(1, employeeCurrentPage - 1))}
+                    className={employeeCurrentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                  />
+                </PaginationItem>
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                  <PaginationItem key={page}>
+                    <PaginationLink
+                      onClick={() => setEmployeeCurrentPage(page)}
+                      isActive={employeeCurrentPage === page}
+                      className="cursor-pointer"
+                    >
+                      {page}
+                    </PaginationLink>
+                  </PaginationItem>
+                ))}
+                <PaginationItem>
+                  <PaginationNext 
+                    onClick={() => setEmployeeCurrentPage(Math.min(totalPages, employeeCurrentPage + 1))}
+                    className={employeeCurrentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const renderDashboard = () => {
+    const completedTasks = tasks.filter(task => task.actualEndDate).length;
+    const inProgressTasks = tasks.filter(task => !task.actualEndDate).length;
+    const todayTasks = tasks.filter(task => task.startDate === new Date().toISOString().split('T')[0]).length;
+
+    return (
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-2xl font-bold text-slate-900">Dashboard</h2>
+          <p className="text-slate-600">Overview of your team's progress</p>
+        </div>
+        
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl p-6 text-white">
+            <h3 className="text-lg font-semibold">Total Tasks</h3>
+            <p className="text-3xl font-bold">{tasks.length}</p>
+          </div>
+          <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-xl p-6 text-white">
+            <h3 className="text-lg font-semibold">Completed</h3>
+            <p className="text-3xl font-bold">{completedTasks}</p>
+          </div>
+          <div className="bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl p-6 text-white">
+            <h3 className="text-lg font-semibold">In Progress</h3>
+            <p className="text-3xl font-bold">{inProgressTasks}</p>
+          </div>
+        </div>
+
+        {/* Recent Tasks */}
+        <div className="bg-white rounded-xl shadow-lg border border-slate-200 p-6">
+          <h3 className="text-lg font-semibold text-slate-900 mb-4">Recent Tasks</h3>
+          <div className="space-y-3">
+            {tasks.slice(0, 5).map((task) => (
+              <TaskCardPremium
+                key={task.id}
+                task={task}
+                employees={employees}
+                onTaskClick={handleTaskClick}
+                onEmployeeClick={handleEmployeeNameClick}
+                onTaskUpdate={updateTask}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderContent = () => {
+    switch (activeTab) {
+      case 'dashboard':
+        return renderDashboard();
+      case 'tasks':
+        return renderTasksView();
+      case 'employees':
+        return renderEmployeesView();
+      default:
+        return (
+          <div className="flex items-center justify-center h-64">
+            <p className="text-slate-500">Coming soon...</p>
+          </div>
+        );
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex">
       {/* Hidden file inputs */}
       <input
         type="file"
@@ -444,511 +770,44 @@ const Index = () => {
         style={{ display: 'none' }}
       />
 
-      {/* Header */}
-      <div className="bg-white border-b border-slate-200 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-slate-900">Task Management</h1>
-              <p className="text-slate-600 mt-1">Organize and track your team's progress</p>
-            </div>
-            <div className="flex gap-3">
-              <Button 
-                onClick={() => setIsEmployeeFormOpen(true)}
-                className="bg-green-600 hover:bg-green-700 text-white shadow-lg hover:shadow-xl transition-all duration-200"
-                size="lg"
-              >
-                <Users className="mr-2 h-5 w-5" />
-                Add Employee
-              </Button>
-              <Button 
-                onClick={() => setIsTaskFormOpen(true)}
-                className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-200"
-                size="lg"
-              >
-                <Plus className="mr-2 h-5 w-5" />
-                New Task
-              </Button>
-            </div>
-          </div>
-
-          {/* Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-8">
-            <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl p-6 text-white">
-              <h3 className="text-lg font-semibold">Total Tasks</h3>
-              <p className="text-3xl font-bold mt-2">{tasks.length}</p>
-            </div>
-            <div className="bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl p-6 text-white">
-              <h3 className="text-lg font-semibold">Today's Tasks</h3>
-              <p className="text-3xl font-bold mt-2">{todayTasks}</p>
-            </div>
-            <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-xl p-6 text-white">
-              <h3 className="text-lg font-semibold">Completed</h3>
-              <p className="text-3xl font-bold mt-2">{completedTasks}</p>
-            </div>
-            <div className="bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl p-6 text-white">
-              <h3 className="text-lg font-semibold">Total Employees</h3>
-              <p className="text-3xl font-bold mt-2">{employees.length}</p>
-            </div>
-          </div>
-        </div>
-      </div>
+      {/* Sidebar */}
+      <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full mt-6">
-          <TabsList className="grid w-full grid-cols-2 mb-6">
-            <TabsTrigger value="tasks">Tasks</TabsTrigger>
-            <TabsTrigger value="employees">Employees</TabsTrigger>
-          </TabsList>
-
-          {/* Tasks Tab */}
-          <TabsContent value="tasks">
-            {/* Filters and Import/Export */}
-            <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between mb-6">
-              <div className="flex items-center gap-2">
-                <Filter className="h-5 w-5 text-slate-500" />
-                <select
-                  value={filterCategory}
-                  onChange={(e) => setFilterCategory(e.target.value as 'all' | 'Product' | 'R&D')}
-                  className="border border-slate-300 rounded-lg px-3 py-2 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                >
-                  <option value="all">All Categories</option>
-                  <option value="Product">Product</option>
-                  <option value="R&D">R&D</option>
-                </select>
-              </div>
-              <div className="flex items-center gap-4">
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => taskFileInputRef.current?.click()}
-                  >
-                    <Upload className="mr-2 h-4 w-4" />
-                    Import CSV
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleTaskExport}
-                  >
-                    <Download className="mr-2 h-4 w-4" />
-                    Export CSV
-                  </Button>
-                </div>
-                <Input
-                  placeholder="Search tasks or employees..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="max-w-sm"
-                />
-              </div>
-            </div>
-
-            {/* Task Tabs */}
-            <Tabs defaultValue="today" className="w-full" onValueChange={() => setCurrentPage(1)}>
-              <TabsList className="grid w-full grid-cols-5 mb-6">
-                <TabsTrigger value="today">Today</TabsTrigger>
-                <TabsTrigger value="all">All Tasks</TabsTrigger>
-                <TabsTrigger value="pending">Pending</TabsTrigger>
-                <TabsTrigger value="completed">Completed</TabsTrigger>
-                <TabsTrigger value="future">Future</TabsTrigger>
-              </TabsList>
-
-              {['today', 'all', 'pending', 'completed', 'future'].map((tabValue) => (
-                <TabsContent key={tabValue} value={tabValue}>
-                  {(() => {
-                    const filteredTasks = getFilteredTasks(tabValue);
-                    const paginatedTasks = getPaginatedTasks(filteredTasks);
-                    const totalPages = getTotalPages(filteredTasks.length);
-                    
-                    if (filteredTasks.length === 0) {
-                      return (
-                        <div className="text-center py-12">
-                          <div className="bg-white rounded-2xl p-8 shadow-sm border border-slate-200">
-                            <h3 className="text-xl font-semibold text-slate-900 mb-2">
-                              No {tabValue === 'all' ? '' : tabValue} tasks found
-                            </h3>
-                            <p className="text-slate-600 mb-6">
-                              {tasks.length === 0 
-                                ? "Get started by creating your first task!" 
-                                : `Try adjusting your filters or search terms to find ${tabValue} tasks.`}
-                            </p>
-                            {tasks.length === 0 && (
-                              <Button 
-                                onClick={() => setIsTaskFormOpen(true)}
-                                className="bg-blue-600 hover:bg-blue-700"
-                              >
-                                <Plus className="mr-2 h-4 w-4" />
-                                Create First Task
-                              </Button>
-                            )}
-                          </div>
-                        </div>
-                      );
-                    }
-
-                    return (
-                      <div className="bg-white rounded-2xl shadow-sm border border-slate-200">
-                        {/* Records Count */}
-                        <div className="px-6 py-4 border-b border-slate-200">
-                          <p className="text-sm text-slate-600">
-                            Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, filteredTasks.length)} of {filteredTasks.length} records
-                          </p>
-                        </div>
-
-                        {/* Table */}
-                        <Table>
-                          <TableHeader>
-                            <TableRow>
-                              <TableHead>Employee</TableHead>
-                              <TableHead>Task Name</TableHead>
-                              <TableHead>Category</TableHead>
-                              <TableHead>Status</TableHead>
-                              <TableHead>Start Date</TableHead>
-                              <TableHead>Est. End Date</TableHead>
-                              <TableHead>Actual End Date</TableHead>
-                              <TableHead>Tool Links</TableHead>
-                              <TableHead>Actions</TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {paginatedTasks.map((task) => (
-                              <TableRow key={task.id}>
-                                <TableCell className="font-medium">{task.employeeName}</TableCell>
-                                <TableCell>
-                                  <div>
-                                    <div className="font-medium">{task.taskName}</div>
-                                    <div className="text-sm text-slate-500 truncate max-w-xs">{task.description}</div>
-                                  </div>
-                                </TableCell>
-                                <TableCell>{getCategoryBadge(task.category)}</TableCell>
-                                <TableCell>{getTaskStatusBadge(task)}</TableCell>
-                                <TableCell>{formatDate(task.startDate)}</TableCell>
-                                <TableCell>{formatDate(task.estimatedEndDate)}</TableCell>
-                                <TableCell>{task.actualEndDate ? formatDate(task.actualEndDate) : '-'}</TableCell>
-                                <TableCell>
-                                  <div className="flex gap-1">
-                                    {task.toolLinks.slice(0, 2).map((link) => (
-                                      <a
-                                        key={link.id}
-                                        href={link.url}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="inline-flex items-center px-2 py-1 text-xs bg-slate-100 hover:bg-slate-200 rounded"
-                                      >
-                                        <ExternalLink className="h-3 w-3 mr-1" />
-                                        {link.name}
-                                      </a>
-                                    ))}
-                                    {task.toolLinks.length > 2 && (
-                                      <span className="text-xs text-slate-500">+{task.toolLinks.length - 2} more</span>
-                                    )}
-                                  </div>
-                                </TableCell>
-                                <TableCell>
-                                  <div className="flex gap-2">
-                                    <Button
-                                      variant="outline"
-                                      size="sm"
-                                      onClick={() => setEditingTask(task)}
-                                    >
-                                      <Edit className="h-4 w-4" />
-                                    </Button>
-                                    <Button
-                                      variant="outline"
-                                      size="sm"
-                                      onClick={() => deleteTask(task.id)}
-                                      className="text-red-600 hover:text-red-700"
-                                    >
-                                      <Trash2 className="h-4 w-4" />
-                                    </Button>
-                                  </div>
-                                </TableCell>
-                              </TableRow>
-                            ))}
-                          </TableBody>
-                        </Table>
-
-                        {/* Pagination */}
-                        {totalPages > 1 && (
-                          <div className="px-6 py-4 border-t border-slate-200">
-                            <Pagination>
-                              <PaginationContent>
-                                <PaginationItem>
-                                  <PaginationPrevious 
-                                    onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                                    className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
-                                  />
-                                </PaginationItem>
-                                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                                  <PaginationItem key={page}>
-                                    <PaginationLink
-                                      onClick={() => setCurrentPage(page)}
-                                      isActive={currentPage === page}
-                                      className="cursor-pointer"
-                                    >
-                                      {page}
-                                    </PaginationLink>
-                                  </PaginationItem>
-                                ))}
-                                <PaginationItem>
-                                  <PaginationNext 
-                                    onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                                    className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
-                                  />
-                                </PaginationItem>
-                              </PaginationContent>
-                            </Pagination>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })()}
-                </TabsContent>
-              ))}
-            </Tabs>
-          </TabsContent>
-
-          {/* Employees Tab */}
-          <TabsContent value="employees">
-            {/* Employee Filters and Import/Export */}
-            <div className="flex flex-col gap-4 mb-6">
-              <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-                <div className="flex flex-wrap items-center gap-2">
-                  <Filter className="h-5 w-5 text-slate-500" />
-                  <select
-                    value={employeeStatusFilter}
-                    onChange={(e) => setEmployeeStatusFilter(e.target.value as any)}
-                    className="border border-slate-300 rounded-lg px-3 py-2 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  >
-                    <option value="all">All Status</option>
-                    <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
-                    <option value="on-leave">On Leave</option>
-                  </select>
-                  <select
-                    value={employeeRoleFilter}
-                    onChange={(e) => setEmployeeRoleFilter(e.target.value as any)}
-                    className="border border-slate-300 rounded-lg px-3 py-2 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  >
-                    <option value="all">All Roles</option>
-                    <option value="admin">Admin</option>
-                    <option value="manager">Manager</option>
-                    <option value="employee">Employee</option>
-                  </select>
-                  <select
-                    value={employeeDepartmentFilter}
-                    onChange={(e) => setEmployeeDepartmentFilter(e.target.value as any)}
-                    className="border border-slate-300 rounded-lg px-3 py-2 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  >
-                    <option value="all">All Departments</option>
-                    <option value="Engineering">Engineering</option>
-                    <option value="Design">Design</option>
-                    <option value="Marketing">Marketing</option>
-                    <option value="Sales">Sales</option>
-                    <option value="HR">HR</option>
-                    <option value="Finance">Finance</option>
-                  </select>
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => employeeFileInputRef.current?.click()}
-                    >
-                      <Upload className="mr-2 h-4 w-4" />
-                      Import CSV
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handleEmployeeExport}
-                    >
-                      <Download className="mr-2 h-4 w-4" />
-                      Export CSV
-                    </Button>
-                  </div>
-                </div>
-              </div>
-              <Input
-                placeholder="Search employees..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="max-w-sm"
-              />
-            </div>
-
-            {(() => {
-              const filteredEmployees = getFilteredEmployees();
-              const paginatedEmployees = getPaginatedEmployees(filteredEmployees);
-              const totalPages = getTotalPages(filteredEmployees.length);
-
-              if (filteredEmployees.length === 0) {
-                return (
-                  <div className="text-center py-12">
-                    <div className="bg-white rounded-2xl p-8 shadow-sm border border-slate-200">
-                      <h3 className="text-xl font-semibold text-slate-900 mb-2">
-                        No employees found
-                      </h3>
-                      <p className="text-slate-600 mb-6">
-                        {employees.length === 0 
-                          ? "Get started by adding your first employee!" 
-                          : "Try adjusting your search terms to find employees."}
-                      </p>
-                      {employees.length === 0 && (
-                        <Button 
-                          onClick={() => setIsEmployeeFormOpen(true)}
-                          className="bg-green-600 hover:bg-green-700"
-                        >
-                          <Users className="mr-2 h-4 w-4" />
-                          Add First Employee
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                );
-              }
-
-              return (
-                <div className="bg-white rounded-2xl shadow-sm border border-slate-200">
-                  <div className="px-6 py-4 border-b border-slate-200">
-                    <p className="text-sm text-slate-600">
-                      Showing {((employeeCurrentPage - 1) * itemsPerPage) + 1} to {Math.min(employeeCurrentPage * itemsPerPage, filteredEmployees.length)} of {filteredEmployees.length} records
-                    </p>
-                  </div>
-
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Name</TableHead>
-                        <TableHead>Email</TableHead>
-                        <TableHead>Department</TableHead>
-                        <TableHead>Position</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Role</TableHead>
-                        <TableHead>Premium</TableHead>
-                        <TableHead>Created Date</TableHead>
-                        <TableHead>Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {paginatedEmployees.map((employee) => (
-                        <TableRow key={employee.id}>
-                          <TableCell className="font-medium">
-                            <button
-                              onClick={() => handleUserNameClick(employee)}
-                              className="text-blue-600 hover:text-blue-800 hover:underline font-medium"
-                            >
-                              {employee.name}
-                            </button>
-                          </TableCell>
-                          <TableCell>{employee.email}</TableCell>
-                          <TableCell>
-                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                              {employee.department}
-                            </span>
-                          </TableCell>
-                          <TableCell>{employee.position}</TableCell>
-                          <TableCell>{getEmployeeStatusBadge(employee.status)}</TableCell>
-                          <TableCell>{getRoleBadge(employee.role)}</TableCell>
-                          <TableCell>
-                            {employee.premiumAccess ? (
-                              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                                Premium
-                              </span>
-                            ) : (
-                              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                                Standard
-                              </span>
-                            )}
-                          </TableCell>
-                          <TableCell>{formatDate(employee.createdDate)}</TableCell>
-                          <TableCell>
-                            <div className="flex gap-2">
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => setEditingEmployee(employee)}
-                              >
-                                <Edit className="h-4 w-4" />
-                              </Button>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => deleteEmployee(employee.id)}
-                                className="text-red-600 hover:text-red-700"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-
-                  {totalPages > 1 && (
-                    <div className="px-6 py-4 border-t border-slate-200">
-                      <Pagination>
-                        <PaginationContent>
-                          <PaginationItem>
-                            <PaginationPrevious 
-                              onClick={() => setEmployeeCurrentPage(Math.max(1, employeeCurrentPage - 1))}
-                              className={employeeCurrentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
-                            />
-                          </PaginationItem>
-                          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                            <PaginationItem key={page}>
-                              <PaginationLink
-                                onClick={() => setEmployeeCurrentPage(page)}
-                                isActive={employeeCurrentPage === page}
-                                className="cursor-pointer"
-                              >
-                                {page}
-                              </PaginationLink>
-                            </PaginationItem>
-                          ))}
-                          <PaginationItem>
-                            <PaginationNext 
-                              onClick={() => setEmployeeCurrentPage(Math.min(totalPages, employeeCurrentPage + 1))}
-                              className={employeeCurrentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
-                            />
-                          </PaginationItem>
-                        </PaginationContent>
-                      </Pagination>
-                    </div>
-                  )}
-                </div>
-              );
-            })()}
-          </TabsContent>
-        </Tabs>
+      <div className="flex-1 p-8">
+        {renderContent()}
       </div>
 
       {/* Forms */}
-      {(isTaskFormOpen || editingTask) && (
+      {isTaskFormOpen && (
         <TaskForm
-          task={editingTask}
           employees={employees}
-          onSubmit={editingTask ? updateTask : addTask}
-          onClose={() => {
-            setIsTaskFormOpen(false);
-            setEditingTask(null);
-          }}
+          onSubmit={addTask}
+          onClose={() => setIsTaskFormOpen(false)}
         />
       )}
 
-      {(isEmployeeFormOpen || editingEmployee) && (
+      {isEmployeeFormOpen && (
+        <EmployeeForm
+          onSubmit={addEmployee}
+          onClose={() => setIsEmployeeFormOpen(false)}
+        />
+      )}
+
+      {editingTask && (
+        <TaskForm
+          task={editingTask}
+          employees={employees}
+          onSubmit={updateTask}
+          onClose={() => setEditingTask(null)}
+        />
+      )}
+
+      {editingEmployee && (
         <EmployeeForm
           employee={editingEmployee}
-          onSubmit={editingEmployee ? updateEmployee : addEmployee}
-          onClose={() => {
-            setIsEmployeeFormOpen(false);
-            setEditingEmployee(null);
-          }}
+          onSubmit={updateEmployee}
+          onClose={() => setEditingEmployee(null)}
         />
       )}
     </div>
