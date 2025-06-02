@@ -66,7 +66,6 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-feature-settings: "rlig" 1, "calt" 1;
   }
 }
 
@@ -77,80 +76,4 @@
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
-  
-  /* Layout utilities */
-  .sidebar-fixed {
-    @apply fixed left-0 top-0 h-screen w-64 z-40;
-  }
-  
-  .main-content {
-    @apply ml-64 min-h-screen;
-  }
-  
-  /* Responsive utilities */
-  @media (max-width: 768px) {
-    .main-content {
-      @apply ml-0;
-    }
-    
-    .sidebar-fixed {
-      @apply -translate-x-full transition-transform duration-300;
-    }
-    
-    .sidebar-fixed.sidebar-open {
-      @apply translate-x-0;
-    }
-  }
-  
-  /* Improved spacing */
-  .container-padding {
-    @apply px-4 sm:px-6 lg:px-8;
-  }
-  
-  .section-spacing {
-    @apply py-6 lg:py-8;
-  }
-  
-  /* Card improvements */
-  .card-hover {
-    @apply transition-all duration-200 hover:shadow-lg hover:-translate-y-1;
-  }
-  
-  /* Button improvements */
-  .btn-primary {
-    @apply bg-blue-600 hover:bg-blue-700 text-white transition-colors duration-200;
-  }
-  
-  /* Text improvements */
-  .text-gradient {
-    @apply bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent;
-  }
-}
-
-/* Smooth scrolling */
-html {
-  scroll-behavior: smooth;
-}
-
-/* Focus styles */
-*:focus-visible {
-  @apply outline-2 outline-offset-2 outline-blue-500;
-}
-
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-::-webkit-scrollbar-track {
-  @apply bg-slate-100;
-}
-
-::-webkit-scrollbar-thumb {
-  @apply bg-slate-300 rounded-full;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  @apply bg-slate-400;
 }
