@@ -15,11 +15,11 @@ import {
 import { cn } from '@/lib/utils';
 
 interface SidebarProps {
-  activeTab?: string;
-  onTabChange?: (tab: string) => void;
+  activeTab: string;
+  onTabChange: (tab: string) => void;
 }
 
-const Sidebar = ({ activeTab = 'today', onTabChange = () => {} }: SidebarProps) => {
+const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
   const [tasksExpanded, setTasksExpanded] = useState(true);
 
   const menuItems = [
@@ -61,7 +61,7 @@ const Sidebar = ({ activeTab = 'today', onTabChange = () => {} }: SidebarProps) 
         <div className="space-y-2">
           {menuItems.map((item) => {
             const isActive = activeTab === item.id || 
-              (item.hasSubmenu && activeTab && activeTab.startsWith('tasks-'));
+              (item.hasSubmenu && activeTab.startsWith('tasks-'));
             
             return (
               <div key={item.id}>
