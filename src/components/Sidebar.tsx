@@ -5,9 +5,7 @@ import {
   LayoutDashboard, 
   CheckSquare, 
   Users, 
-  Calendar, 
   BarChart3, 
-  Settings,
   ChevronLeft,
   ChevronRight,
   ChevronDown,
@@ -42,9 +40,7 @@ const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
       ]
     },
     { id: 'employees', label: 'Employees', icon: Users },
-    { id: 'calendar', label: 'Calendar', icon: Calendar },
     { id: 'analytics', label: 'Analytics', icon: BarChart3 },
-    { id: 'settings', label: 'Settings', icon: Settings },
   ];
 
   const handleTasksClick = () => {
@@ -59,14 +55,14 @@ const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
 
   return (
     <div className={cn(
-      "bg-white border-r border-slate-200 shadow-lg transition-all duration-300 ease-in-out flex flex-col",
+      "bg-gradient-to-b from-white to-slate-50 border-r border-slate-200/60 shadow-xl transition-all duration-300 ease-in-out flex flex-col backdrop-blur-sm",
       isCollapsed ? "w-16" : "w-64"
     )}>
       {/* Header */}
-      <div className="p-4 border-b border-slate-200">
+      <div className="p-4 border-b border-slate-200/60 bg-gradient-to-r from-blue-50 to-indigo-50">
         <div className="flex items-center justify-between">
           {!isCollapsed && (
-            <h2 className="text-xl font-bold text-slate-900 animate-fade-in">
+            <h2 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent animate-fade-in">
               TaskFlow
             </h2>
           )}
@@ -74,7 +70,7 @@ const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
             variant="ghost"
             size="sm"
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className="hover:bg-slate-100 transition-colors"
+            className="hover:bg-blue-100 transition-all duration-200 rounded-full p-2"
           >
             {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
           </Button>
@@ -82,8 +78,8 @@ const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 p-2">
-        <div className="space-y-1">
+      <nav className="flex-1 p-3">
+        <div className="space-y-2">
           {menuItems.map((item) => {
             const isActive = activeTab === item.id || 
               (item.hasSubmenu && activeTab.startsWith('tasks-'));
@@ -94,18 +90,22 @@ const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
                   variant="ghost"
                   onClick={item.hasSubmenu ? handleTasksClick : () => onTabChange(item.id)}
                   className={cn(
-                    "w-full justify-start transition-all duration-200 hover:bg-blue-50 hover:text-blue-700",
-                    isActive && "bg-blue-100 text-blue-700 border-r-2 border-blue-500",
-                    isCollapsed ? "px-2" : "px-3"
+                    "w-full justify-start transition-all duration-300 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 hover:text-blue-700 hover:shadow-md rounded-xl",
+                    isActive && "bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-700 shadow-lg border border-blue-200/50",
+                    isCollapsed ? "px-2" : "px-4 py-3"
                   )}
                 >
-                  <item.icon className={cn("h-5 w-5", isCollapsed ? "mr-0" : "mr-3")} />
+                  <item.icon className={cn(
+                    "h-5 w-5 transition-colors duration-200", 
+                    isActive ? "text-blue-600" : "",
+                    isCollapsed ? "mr-0" : "mr-3"
+                  )} />
                   {!isCollapsed && (
-                    <span className="animate-fade-in flex-1 text-left">{item.label}</span>
+                    <span className="animate-fade-in flex-1 text-left font-medium">{item.label}</span>
                   )}
                   {!isCollapsed && item.hasSubmenu && (
                     <ChevronDown className={cn(
-                      "h-4 w-4 transition-transform duration-200",
+                      "h-4 w-4 transition-transform duration-300",
                       tasksExpanded ? "rotate-180" : ""
                     )} />
                   )}
@@ -113,19 +113,19 @@ const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
                 
                 {/* Submenu */}
                 {item.hasSubmenu && !isCollapsed && tasksExpanded && (
-                  <div className="ml-6 mt-1 space-y-1 animate-fade-in">
+                  <div className="ml-4 mt-2 space-y-1 animate-fade-in">
                     {item.submenu?.map((subItem) => (
                       <Button
                         key={subItem.id}
                         variant="ghost"
                         onClick={() => onTabChange(subItem.id)}
                         className={cn(
-                          "w-full justify-start text-sm transition-all duration-200 hover:bg-blue-50 hover:text-blue-700",
-                          activeTab === subItem.id && "bg-blue-100 text-blue-700"
+                          "w-full justify-start text-sm transition-all duration-300 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 hover:text-blue-700 hover:shadow-sm rounded-lg py-2",
+                          activeTab === subItem.id && "bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-700 shadow-sm border border-blue-100"
                         )}
                       >
-                        <subItem.icon className="h-4 w-4 mr-3" />
-                        <span>{subItem.label}</span>
+                        <subItem.icon className="h-4 w-4 mr-3 text-blue-500" />
+                        <span className="font-medium">{subItem.label}</span>
                       </Button>
                     ))}
                   </div>
@@ -137,10 +137,11 @@ const Sidebar = ({ activeTab, onTabChange }: SidebarProps) => {
       </nav>
 
       {/* Footer */}
-      <div className="p-4 border-t border-slate-200">
+      <div className="p-4 border-t border-slate-200/60 bg-gradient-to-r from-slate-50 to-blue-50">
         {!isCollapsed && (
-          <div className="text-xs text-slate-500 animate-fade-in">
-            © 2024 TaskFlow Premium
+          <div className="text-xs text-slate-500 animate-fade-in text-center">
+            <div className="font-semibold text-blue-600">TaskFlow Premium</div>
+            <div className="mt-1">© 2024 All Rights Reserved</div>
           </div>
         )}
       </div>
