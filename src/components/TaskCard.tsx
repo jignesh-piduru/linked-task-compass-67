@@ -1,12 +1,19 @@
 
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Calendar, User, Link, Edit, Trash2, CheckCircle, Clock } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { 
+  Calendar, 
+  User, 
+  Edit, 
+  Trash2, 
+  CheckCircle,
+  Clock,
+  ExternalLink
+} from 'lucide-react';
 import { Task } from '@/types/Task';
 import { Employee } from '@/types/Employee';
-import TaskForm from './TaskForm';
 
 interface TaskCardProps {
   task: Task;
@@ -15,147 +22,131 @@ interface TaskCardProps {
   onDelete: (taskId: string) => void;
 }
 
-const TaskCard = ({ task, employees, onUpdate, onDelete }: TaskCardProps) => {
+const TaskCard: React.FC<TaskCardProps> = ({ task, employees, onUpdate, onDelete }) => {
   const [isEditing, setIsEditing] = useState(false);
 
-  const isOverdue = !task.actualEndDate && new Date(task.estimatedEndDate) < new Date();
-  const isCompleted = !!task.actualEndDate;
-
-  const handleUpdate = (updatedTask: Omit<Task, 'id'>) => {
-    onUpdate({ ...updatedTask, id: task.id });
-    setIsEditing(false);
-  };
-
-  const markAsCompleted = () => {
-    onUpdate({
+  const handleMarkCompleted = () => {
+    const updatedTask = {
       ...task,
       actualEndDate: new Date().toISOString().split('T')[0]
-    });
+    };
+    onUpdate(updatedTask);
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric'
-    });
+  const handleMarkIncomplete = () => {
+    const updatedTask = {
+      ...task,
+      actualEndDate: ''
+    };
+    onUpdate(updatedTask);
   };
+
+  const isCompleted = !!task.actualEndDate;
+  const isOverdue = !isCompleted && new Date(task.estimatedEndDate) < new Date();
 
   return (
-    <>
-      <Card className={`hover:shadow-lg transition-all duration-200 ${
-        isCompleted ? 'bg-green-50 border-green-200' :
-        isOverdue ? 'bg-red-50 border-red-200' : 
-        'bg-white hover:bg-slate-50'
-      }`}>
-        <CardHeader className="pb-3">
-          <div className="flex items-start justify-between">
-            <div className="flex-1">
-              <CardTitle className="text-lg font-semibold text-slate-900 mb-2">
-                {task.taskName}
-              </CardTitle>
-              <div className="flex items-center gap-2 mb-2">
-                <User className="h-4 w-4 text-slate-500" />
-                <span className="text-sm font-medium text-slate-700">{task.employeeName}</span>
-              </div>
-              <Badge 
-                variant={task.category === 'Product' ? 'default' : 'secondary'}
-                className={task.category === 'Product' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'}
-              >
-                {task.category}
-              </Badge>
-            </div>
-            <div className="flex gap-1">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setIsEditing(true)}
-                className="h-8 w-8 p-0"
-              >
-                <Edit className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => onDelete(task.id)}
-                className="h-8 w-8 p-0 text-red-500 hover:text-red-700"
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
+    <Card className={`hover:shadow-lg transition-shadow ${isCompleted ? 'bg-green-50 border-green-200' : isOverdue ? 'bg-red-50 border-red-200' : ''}`}>
+      <CardHeader>
+        <div className="flex items-start justify-between">
+          <div className="flex-1">
+            <CardTitle className="text-lg flex items-center gap-2">
+              {task.taskName}
+              {isCompleted && <CheckCircle className="h-5 w-5 text-green-600" />}
+              {isOverdue && <Clock className="h-5 w-5 text-red-600" />}
+            </CardTitle>
+            <div className="flex items-center gap-2 mt-2">
+              <Badge variant="secondary">{task.category}</Badge>
+              {isCompleted && <Badge className="bg-green-100 text-green-800">Completed</Badge>}
+              {isOverdue && <Badge variant="destructive">Overdue</Badge>}
             </div>
           </div>
-        </CardHeader>
-
-        <CardContent className="space-y-4">
-          <p className="text-sm text-slate-600 leading-relaxed">{task.description}</p>
-
-          {/* Dates */}
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 text-sm">
-              <Calendar className="h-4 w-4 text-slate-500" />
-              <span className="text-slate-600">Started: {formatDate(task.startDate)}</span>
-            </div>
-            <div className="flex items-center gap-2 text-sm">
-              <Clock className="h-4 w-4 text-slate-500" />
-              <span className="text-slate-600">Due: {formatDate(task.estimatedEndDate)}</span>
-              {isOverdue && !isCompleted && (
-                <Badge variant="destructive" className="text-xs">Overdue</Badge>
-              )}
-            </div>
-            {task.actualEndDate && (
-              <div className="flex items-center gap-2 text-sm">
-                <CheckCircle className="h-4 w-4 text-green-500" />
-                <span className="text-green-600">Completed: {formatDate(task.actualEndDate)}</span>
-              </div>
-            )}
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setIsEditing(!isEditing)}
+            >
+              <Edit className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onDelete(task.id)}
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
           </div>
-
-          {/* Tool Links */}
-          {task.toolLinks && task.toolLinks.length > 0 && (
-            <div>
-              <h4 className="text-sm font-medium text-slate-700 mb-2 flex items-center gap-1">
-                <Link className="h-4 w-4" />
-                Tool Links
-              </h4>
-              <div className="space-y-1">
-                {task.toolLinks.map((link) => (
-                  <a
-                    key={link.id}
-                    href={link.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block text-sm text-blue-600 hover:text-blue-800 hover:underline truncate"
-                  >
-                    {link.name}
-                  </a>
-                ))}
-              </div>
+        </div>
+      </CardHeader>
+      
+      <CardContent>
+        <p className="text-slate-600 mb-4">{task.description}</p>
+        
+        <div className="space-y-3">
+          <div className="flex items-center text-sm text-slate-500">
+            <User className="mr-2 h-4 w-4" />
+            Assigned to: {task.employeeName}
+          </div>
+          
+          <div className="flex items-center text-sm text-slate-500">
+            <Calendar className="mr-2 h-4 w-4" />
+            Start: {new Date(task.startDate).toLocaleDateString()}
+          </div>
+          
+          <div className="flex items-center text-sm text-slate-500">
+            <Calendar className="mr-2 h-4 w-4" />
+            Due: {new Date(task.estimatedEndDate).toLocaleDateString()}
+          </div>
+          
+          {task.actualEndDate && (
+            <div className="flex items-center text-sm text-green-600">
+              <CheckCircle className="mr-2 h-4 w-4" />
+              Completed: {new Date(task.actualEndDate).toLocaleDateString()}
             </div>
           )}
+        </div>
 
-          {/* Action Button */}
-          {!isCompleted && (
-            <Button
-              onClick={markAsCompleted}
-              className="w-full bg-green-600 hover:bg-green-700 text-white"
-              size="sm"
+        {/* Tool Links Section */}
+        {task.toolLinks && task.toolLinks.length > 0 && (
+          <div className="mt-4">
+            <h4 className="text-sm font-medium text-slate-700 mb-2">Tool Links:</h4>
+            <div className="space-y-2">
+              {task.toolLinks.map((link) => (
+                <a
+                  key={link.id}
+                  href={link.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center text-sm text-blue-600 hover:text-blue-800"
+                >
+                  <ExternalLink className="mr-2 h-3 w-3" />
+                  {link.name}
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
+        
+        <div className="flex gap-2 mt-4">
+          {!isCompleted ? (
+            <Button 
+              onClick={handleMarkCompleted}
+              className="bg-green-600 hover:bg-green-700"
             >
               <CheckCircle className="mr-2 h-4 w-4" />
-              Mark as Completed
+              Mark Complete
+            </Button>
+          ) : (
+            <Button 
+              variant="outline"
+              onClick={handleMarkIncomplete}
+            >
+              Mark Incomplete
             </Button>
           )}
-        </CardContent>
-      </Card>
-
-      {isEditing && (
-        <TaskForm
-          task={task}
-          employees={employees}
-          onSubmit={handleUpdate}
-          onClose={() => setIsEditing(false)}
-        />
-      )}
-    </>
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 

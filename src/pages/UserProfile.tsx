@@ -25,17 +25,83 @@ import {
 import { Employee } from '@/types/Employee';
 import { Task } from '@/types/Task';
 
-interface UserProfileProps {
-  employees?: Employee[];
-  tasks?: Task[];
-}
-
-const UserProfile = ({ employees = [], tasks = [] }: UserProfileProps) => {
+const UserProfile = () => {
   const { userId } = useParams();
   const navigate = useNavigate();
   
+  // Mock data - in a real app this would come from a global state or API
+  const mockEmployees: Employee[] = [
+    {
+      id: '1',
+      name: 'John Doe',
+      email: 'john.doe@company.com',
+      department: 'Engineering',
+      position: 'Senior Developer',
+      skills: ['React', 'TypeScript', 'Node.js'],
+      createdDate: '2024-01-01'
+    },
+    {
+      id: '2',
+      name: 'Jane Smith',
+      email: 'jane.smith@company.com',
+      department: 'Design',
+      position: 'UX Designer',
+      skills: ['Figma', 'Sketch', 'User Research'],
+      createdDate: '2024-01-02'
+    },
+    {
+      id: '3',
+      name: 'Mike Johnson',
+      email: 'mike.johnson@company.com',
+      department: 'Engineering',
+      position: 'Backend Developer',
+      skills: ['Python', 'PostgreSQL', 'Docker'],
+      createdDate: '2024-01-03'
+    }
+  ];
+
+  const mockTasks: Task[] = [
+    {
+      id: '1',
+      taskName: 'Design System Implementation',
+      description: 'Create a comprehensive design system for the application',
+      category: 'Product',
+      employeeName: 'John Doe',
+      startDate: '2024-01-15',
+      estimatedEndDate: '2024-02-15',
+      actualEndDate: '',
+      toolLinks: [
+        { id: '1', name: 'Figma Design', url: 'https://figma.com/design-system' }
+      ]
+    },
+    {
+      id: '2',
+      taskName: 'API Integration',
+      description: 'Integrate the new payment API endpoints',
+      category: 'R&D',
+      employeeName: 'Jane Smith',
+      startDate: '2024-01-20',
+      estimatedEndDate: '2024-02-20',
+      actualEndDate: '',
+      toolLinks: [
+        { id: '2', name: 'API Documentation', url: 'https://api-docs.example.com' }
+      ]
+    },
+    {
+      id: '3',
+      taskName: 'Database Optimization',
+      description: 'Optimize database queries for better performance',
+      category: 'Product',
+      employeeName: 'Mike Johnson',
+      startDate: '2024-01-10',
+      estimatedEndDate: '2024-02-10',
+      actualEndDate: '2024-02-08',
+      toolLinks: []
+    }
+  ];
+  
   // Find the employee by ID or name
-  const employee = employees.find(emp => emp.id === userId || emp.name.toLowerCase().replace(/\s+/g, '-') === userId);
+  const employee = mockEmployees.find(emp => emp.id === userId || emp.name.toLowerCase().replace(/\s+/g, '-') === userId);
   
   if (!employee) {
     return (
@@ -58,7 +124,7 @@ const UserProfile = ({ employees = [], tasks = [] }: UserProfileProps) => {
   const isPremiumUser = employee.premiumAccess || Math.random() > 0.5;
   
   // Get user's tasks
-  const userTasks = tasks.filter(task => task.employeeName === employee.name);
+  const userTasks = mockTasks.filter(task => task.employeeName === employee.name);
   const todayTasks = userTasks.filter(task => {
     const today = new Date().toDateString();
     return new Date(task.startDate).toDateString() === today;
