@@ -1,88 +1,79 @@
-
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
-import { Plus, Filter, Edit, Trash2, Users, Download, Upload, BarChart3, TrendingUp, Clock, CheckCircle, UserPlus } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
+import { 
+  Plus, 
+  CheckCircle, 
+  Clock, 
+  AlertTriangle, 
+  Users,
+  BarChart3,
+  Calendar,
+  FileText,
+  Star,
+  Target,
+  TrendingUp,
+  Filter,
+  Download,
+  Search,
+  Zap
+} from 'lucide-react';
+import TaskCard from '@/components/TaskCard';
 import TaskForm from '@/components/TaskForm';
 import EmployeeForm from '@/components/EmployeeForm';
-import TaskCardPremium from '@/components/TaskCardPremium';
 import Sidebar from '@/components/Sidebar';
-import { Employee } from '@/types/Employee';
-import { Task } from '@/types/Task';
-import { csvUtils } from '@/utils/csvUtils';
+import type { Task } from '@/types/Task';
+import type { Employee } from '@/types/Employee';
 
 const Index = () => {
-  const navigate = useNavigate();
-  const { toast } = useToast();
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  
-  // State management
   const [activeTab, setActiveTab] = useState('dashboard');
-  const [showTaskForm, setShowTaskForm] = useState(false);
-  const [showEmployeeForm, setShowEmployeeForm] = useState(false);
-  const [editingTask, setEditingTask] = useState<Task | null>(null);
-  const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterStatus, setFilterStatus] = useState('all');
-  const itemsPerPage = 10;
-
-  // Sample data with correct types
   const [tasks, setTasks] = useState<Task[]>([
     {
       id: '1',
-      employeeName: 'John Doe',
-      taskName: 'Implement user authentication',
-      description: 'Set up login and registration functionality',
-      category: 'Product',
-      startDate: '2024-01-01',
-      estimatedEndDate: '2024-01-15',
-      toolLinks: []
+      title: 'Design System Implementation',
+      description: 'Create a comprehensive design system for the application',
+      status: 'in-progress',
+      priority: 'high',
+      assignedTo: 'John Doe',
+      dueDate: '2024-02-15',
+      tags: ['design', 'frontend'],
+      estimatedHours: 40,
+      actualHours: 15,
+      completionPercentage: 60
     },
     {
       id: '2',
-      employeeName: 'Jane Smith',
-      taskName: 'Design database schema',
-      description: 'Create ERD and define relationships between entities',
-      category: 'Product',
-      startDate: '2024-01-02',
-      estimatedEndDate: '2024-01-10',
-      actualEndDate: '2024-01-09',
-      toolLinks: []
+      title: 'API Integration',
+      description: 'Integrate the new payment API endpoints',
+      status: 'todo',
+      priority: 'medium',
+      assignedTo: 'Jane Smith',
+      dueDate: '2024-02-20',
+      tags: ['backend', 'api'],
+      estimatedHours: 25,
+      actualHours: 0,
+      completionPercentage: 0
     },
     {
       id: '3',
-      employeeName: 'Mike Johnson',
-      taskName: 'Implement API endpoints',
-      description: 'Create RESTful API endpoints for the application',
-      category: 'R&D',
-      startDate: '2024-01-03',
-      estimatedEndDate: '2024-01-20',
-      toolLinks: []
-    },
-    {
-      id: '4',
-      employeeName: 'Sarah Williams',
-      taskName: 'Write unit tests',
-      description: 'Create comprehensive test suite for all components',
-      category: 'Product',
-      startDate: '2024-01-04',
-      estimatedEndDate: '2024-01-25',
-      toolLinks: []
-    },
-    {
-      id: '5',
-      employeeName: 'John Doe',
-      taskName: 'Deploy to staging',
-      description: 'Set up CI/CD pipeline and deploy to staging environment',
-      category: 'Product',
-      startDate: '2024-01-05',
-      estimatedEndDate: '2024-01-30',
-      toolLinks: []
+      title: 'Database Optimization',
+      description: 'Optimize database queries for better performance',
+      status: 'completed',
+      priority: 'high',
+      assignedTo: 'Mike Johnson',
+      dueDate: '2024-02-10',
+      tags: ['database', 'performance'],
+      estimatedHours: 30,
+      actualHours: 28,
+      completionPercentage: 100
     }
   ]);
 
@@ -90,739 +81,412 @@ const Index = () => {
     {
       id: '1',
       name: 'John Doe',
-      email: 'john@company.com',
-      position: 'Senior Developer',
+      email: 'john.doe@company.com',
       department: 'Engineering',
-      createdDate: '2022-03-15'
+      position: 'Senior Developer',
+      skills: ['React', 'TypeScript', 'Node.js'],
+      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'
     },
     {
       id: '2',
       name: 'Jane Smith',
-      email: 'jane@company.com',
-      position: 'UX Designer',
+      email: 'jane.smith@company.com',
       department: 'Design',
-      createdDate: '2022-05-10'
+      position: 'UX Designer',
+      skills: ['Figma', 'Sketch', 'User Research'],
+      avatar: 'https://images.unsplash.com/photo-1494790108755-2616b68b3c3a?w=150&h=150&fit=crop&crop=face'
     },
     {
       id: '3',
       name: 'Mike Johnson',
-      email: 'mike@company.com',
-      position: 'Product Manager',
-      department: 'Product',
-      createdDate: '2021-11-20'
-    },
-    {
-      id: '4',
-      name: 'Sarah Williams',
-      email: 'sarah@company.com',
-      position: 'QA Engineer',
+      email: 'mike.johnson@company.com',
       department: 'Engineering',
-      createdDate: '2023-01-05'
+      position: 'Backend Developer',
+      skills: ['Python', 'PostgreSQL', 'Docker'],
+      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face'
     }
   ]);
 
-  // Dashboard metrics
-  const totalTasks = tasks.length;
-  
-  // Get new employees (hired in the last 30 days)
-  const newEmployees = employees.filter(employee => {
-    const hireDate = new Date(employee.createdDate);
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-    return hireDate >= thirtyDaysAgo;
-  });
+  const { toast } = useToast();
+  const navigate = useNavigate();
 
-  const inProgressTasks = tasks.filter(task => !task.actualEndDate && new Date(task.estimatedEndDate) >= new Date()).length;
-  const completedTasks = tasks.filter(task => task.actualEndDate).length;
-  const totalEmployees = employees.length;
-  
-  const todaysTasks = tasks.filter(task => {
-    const today = new Date().toISOString().split('T')[0];
-    return task.estimatedEndDate === today;
-  });
-
-  const completedTasksData = tasks.filter(task => task.actualEndDate);
-  const futureTasks = tasks.filter(task => {
-    const today = new Date().toISOString().split('T')[0];
-    return task.estimatedEndDate > today;
-  });
-
-  // Utility functions
-  const filterTasks = (tasks: Task[]) => {
-    let filtered = [...tasks];
-    
-    if (searchTerm) {
-      filtered = filtered.filter(task => 
-        task.taskName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        task.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        task.employeeName.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-    
-    return filtered;
-  };
-
-  const paginateItems = <T,>(items: T[]) => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    return items.slice(startIndex, startIndex + itemsPerPage);
-  };
-
-  // Event handlers
-  const handleTaskSubmit = (task: Omit<Task, 'id'>) => {
-    if (editingTask) {
-      setTasks(tasks.map(t => t.id === editingTask.id ? { ...task, id: editingTask.id } : t));
-      toast({
-        title: "Task updated",
-        description: `Task "${task.taskName}" has been updated.`,
-      });
-    } else {
-      const newTask: Task = {
-        ...task,
-        id: (tasks.length + 1).toString(),
-      };
-      setTasks([...tasks, newTask]);
-      toast({
-        title: "Task created",
-        description: `Task "${task.taskName}" has been created.`,
-      });
-    }
-    setShowTaskForm(false);
-    setEditingTask(null);
-  };
-
-  const handleEmployeeSubmit = (employee: Omit<Employee, 'id'>) => {
-    if (editingEmployee) {
-      setEmployees(employees.map(e => e.id === editingEmployee.id ? { ...employee, id: editingEmployee.id } : e));
-      toast({
-        title: "Employee updated",
-        description: `Employee "${employee.name}" has been updated.`,
-      });
-    } else {
-      const newEmployee: Employee = {
-        ...employee,
-        id: (employees.length + 1).toString(),
-      };
-      setEmployees([...employees, newEmployee]);
-      toast({
-        title: "Employee added",
-        description: `Employee "${employee.name}" has been added.`,
-      });
-    }
-    setShowEmployeeForm(false);
-    setEditingEmployee(null);
-  };
-
-  const handleEditTask = (task: Task) => {
-    setEditingTask(task);
-    setShowTaskForm(true);
-  };
-
-  const handleDeleteTask = (id: string) => {
-    setTasks(tasks.filter(task => task.id !== id));
+  const handleAddTask = (taskData: Omit<Task, 'id'>) => {
+    const newTask: Task = {
+      ...taskData,
+      id: Date.now().toString(),
+    };
+    setTasks([...tasks, newTask]);
     toast({
-      title: "Task deleted",
-      description: "The task has been deleted.",
+      title: "Task created",
+      description: "Your task has been successfully created.",
     });
   };
 
-  const handleEditEmployee = (employee: Employee) => {
-    setEditingEmployee(employee);
-    setShowEmployeeForm(true);
-  };
-
-  const handleDeleteEmployee = (id: string) => {
-    setEmployees(employees.filter(employee => employee.id !== id));
+  const handleAddEmployee = (employeeData: Omit<Employee, 'id'>) => {
+    const newEmployee: Employee = {
+      ...employeeData,
+      id: Date.now().toString(),
+    };
+    setEmployees([...employees, newEmployee]);
     toast({
-      title: "Employee deleted",
-      description: "The employee has been deleted.",
+      title: "Employee added",
+      description: "New employee has been successfully added.",
     });
   };
 
-  const handleEmployeeClick = (employeeName: string) => {
-    const employee = employees.find(e => e.name === employeeName);
-    if (employee) {
-      navigate(`/user/${employee.id}`);
-    }
-  };
-
-  const handleTaskClick = (task: Task) => {
-    navigate(`/task/${task.id}`);
-  };
-
-  const handleTaskUpdate = (updatedTask: Task) => {
-    setTasks(tasks.map(task => task.id === updatedTask.id ? updatedTask : task));
+  const handleTaskUpdate = (taskId: string, updates: Partial<Task>) => {
+    setTasks(tasks.map(task => 
+      task.id === taskId ? { ...task, ...updates } : task
+    ));
     toast({
       title: "Task updated",
-      description: `Task "${updatedTask.taskName}" has been updated.`,
+      description: "Task has been successfully updated.",
     });
   };
 
-  const handleExport = (type: 'tasks' | 'employees') => {
-    const data = type === 'tasks' ? tasks : employees;
-    const filename = `${type}_${new Date().toISOString().split('T')[0]}.csv`;
-    csvUtils.exportToCSV(data, filename);
-    toast({
-      title: "Export successful",
-      description: `${type} data has been exported to ${filename}.`,
-    });
-  };
-
-  const handleImport = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    csvUtils.importFromCSV(file, (data) => {
-      if (data.length > 0 && 'taskName' in data[0]) {
-        setTasks([...tasks, ...data as Task[]]);
-        toast({
-          title: "Import successful",
-          description: `${data.length} tasks have been imported.`,
-        });
-      } else if (data.length > 0 && 'name' in data[0]) {
-        setEmployees([...employees, ...data as Employee[]]);
-        toast({
-          title: "Import successful",
-          description: `${data.length} employees have been imported.`,
-        });
-      } else {
-        toast({
-          title: "Import failed",
-          description: "The file format is not supported.",
-          variant: "destructive",
-        });
-      }
-    });
+  const getFilteredTasks = () => {
+    const today = new Date().toISOString().split('T')[0];
     
-    // Reset the file input
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
+    switch (activeTab) {
+      case 'tasks-today':
+        return tasks.filter(task => task.dueDate === today);
+      case 'tasks-completed':
+        return tasks.filter(task => task.status === 'completed');
+      case 'tasks-future':
+        return tasks.filter(task => task.dueDate > today);
+      case 'tasks-all':
+      case 'tasks':
+        return tasks;
+      default:
+        return tasks;
     }
   };
 
-  const renderDashboard = () => (
-    <div className="space-y-8">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-slate-900 to-blue-600 bg-clip-text text-transparent">
-            Dashboard
-          </h1>
-          <p className="text-slate-600 mt-2 text-lg">Welcome back! Here's what's happening today.</p>
-        </div>
-        <div className="flex gap-3">
-          <Button 
-            onClick={() => setShowTaskForm(true)}
-            className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transition-all duration-300"
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            New Task
-          </Button>
-          <Button 
-            onClick={() => setShowEmployeeForm(true)}
-            variant="outline"
-            className="border-blue-200 hover:bg-blue-50 hover:border-blue-300 transition-all duration-300"
-          >
-            <Users className="mr-2 h-4 w-4" />
-            Add Employee
-          </Button>
-        </div>
-      </div>
+  // Navigate to Analytics page when analytics tab is selected
+  if (activeTab === 'analytics') {
+    navigate('/analytics');
+    return null;
+  }
 
-      {/* Premium Dashboard Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-        <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl shadow-lg border border-blue-200/50 p-6 hover:shadow-xl transition-all duration-300">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-blue-700 text-sm font-semibold uppercase tracking-wide">Total Tasks</p>
-              <p className="text-3xl font-bold text-blue-900 mt-1">{totalTasks}</p>
-            </div>
-            <div className="bg-blue-200 p-3 rounded-full">
-              <BarChart3 className="h-6 w-6 text-blue-700" />
-            </div>
+  const renderContent = () => {
+    if (activeTab === 'employees') {
+      return (
+        <div className="space-y-6">
+          <div className="flex justify-between items-center">
+            <h2 className="text-2xl font-bold text-slate-800">Employee Management</h2>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700">
+                  <Plus className="mr-2 h-4 w-4" />
+                  Add Employee
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-md">
+                <DialogHeader>
+                  <DialogTitle>Add New Employee</DialogTitle>
+                </DialogHeader>
+                <EmployeeForm onSubmit={handleAddEmployee} />
+              </DialogContent>
+            </Dialog>
           </div>
-          <div className="mt-4 flex items-center text-sm text-blue-600">
-            <TrendingUp className="h-4 w-4 mr-1" />
-            <span>Active projects</span>
-          </div>
-        </div>
 
-        <div className="bg-gradient-to-br from-amber-50 to-amber-100 rounded-2xl shadow-lg border border-amber-200/50 p-6 hover:shadow-xl transition-all duration-300">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-amber-700 text-sm font-semibold uppercase tracking-wide">In Progress</p>
-              <p className="text-3xl font-bold text-amber-900 mt-1">{inProgressTasks}</p>
-              <p className="text-sm text-amber-600 mt-1">Active tasks</p>
-            </div>
-            <div className="bg-amber-200 p-3 rounded-full">
-              <Clock className="h-6 w-6 text-amber-700" />
-            </div>
-          </div>
-          <div className="mt-4 flex items-center text-sm text-amber-600">
-            <span>Active development</span>
-          </div>
-        </div>
-
-        <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-2xl shadow-lg border border-green-200/50 p-6 hover:shadow-xl transition-all duration-300">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-green-700 text-sm font-semibold uppercase tracking-wide">Completed</p>
-              <p className="text-3xl font-bold text-green-900 mt-1">{completedTasks}</p>
-            </div>
-            <div className="bg-green-200 p-3 rounded-full">
-              <CheckCircle className="h-6 w-6 text-green-700" />
-            </div>
-          </div>
-          <div className="mt-4 flex items-center text-sm text-green-600">
-            <span>{Math.round((completedTasks / totalTasks) * 100)}% completion rate</span>
-          </div>
-        </div>
-
-        <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl shadow-lg border border-purple-200/50 p-6 hover:shadow-xl transition-all duration-300">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-purple-700 text-sm font-semibold uppercase tracking-wide">Team Members</p>
-              <p className="text-3xl font-bold text-purple-900 mt-1">{totalEmployees}</p>
-            </div>
-            <div className="bg-purple-200 p-3 rounded-full">
-              <Users className="h-6 w-6 text-purple-700" />
-            </div>
-          </div>
-          <div className="mt-4 flex items-center text-sm text-purple-600">
-            <span>Active workforce</span>
-          </div>
-        </div>
-
-        <div className="bg-gradient-to-br from-teal-50 to-teal-100 rounded-2xl shadow-lg border border-teal-200/50 p-6 hover:shadow-xl transition-all duration-300">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-teal-700 text-sm font-semibold uppercase tracking-wide">New Employees</p>
-              <p className="text-3xl font-bold text-teal-900 mt-1">{newEmployees.length}</p>
-            </div>
-            <div className="bg-teal-200 p-3 rounded-full">
-              <UserPlus className="h-6 w-6 text-teal-700" />
-            </div>
-          </div>
-          <div className="mt-4 flex items-center text-sm text-teal-600">
-            <span>Last 30 days</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Recent Tasks Section */}
-      <div className="bg-white rounded-2xl shadow-lg border border-slate-200/60 p-8">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-slate-900">Recent Tasks</h2>
-          <Button 
-            variant="outline" 
-            onClick={() => setActiveTab('tasks-all')}
-            className="hover:bg-blue-50 border-blue-200 text-blue-600 hover:border-blue-300"
-          >
-            View All Tasks
-          </Button>
-        </div>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {tasks.slice(0, 4).map((task) => (
-            <TaskCardPremium 
-              key={task.id} 
-              task={task} 
-              employees={employees}
-              onTaskClick={handleTaskClick}
-              onEmployeeClick={handleEmployeeClick}
-              onTaskUpdate={handleTaskUpdate}
-            />
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-
-  const renderTasks = () => {
-    const filteredTasks = filterTasks(tasks);
-    const paginatedTasks = paginateItems(filteredTasks);
-    const totalPages = Math.ceil(filteredTasks.length / itemsPerPage);
-
-    return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Button 
-              variant="ghost" 
-              onClick={() => setActiveTab('dashboard')}
-              className="hover:bg-blue-50 text-blue-600"
-            >
-              ← Back
-            </Button>
-            <h1 className="text-3xl font-bold text-slate-900">All Tasks</h1>
-          </div>
-          <Button onClick={() => setShowTaskForm(true)}>
-            <Plus className="mr-2 h-4 w-4" />
-            New Task
-          </Button>
-        </div>
-
-        <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
-          <div className="w-full sm:w-auto">
-            <Input
-              placeholder="Search tasks..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full sm:w-80"
-            />
-          </div>
-          <div className="flex gap-2 w-full sm:w-auto">
-            <Button variant="outline" onClick={() => handleExport('tasks')}>
-              <Download className="mr-2 h-4 w-4" />
-              Export
-            </Button>
-            <Button variant="outline" onClick={() => fileInputRef.current?.click()}>
-              <Upload className="mr-2 h-4 w-4" />
-              Import
-            </Button>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {paginatedTasks.map((task) => (
-            <TaskCardPremium 
-              key={task.id} 
-              task={task} 
-              employees={employees}
-              onTaskClick={handleTaskClick}
-              onEmployeeClick={handleEmployeeClick}
-              onTaskUpdate={handleTaskUpdate}
-            />
-          ))}
-          {paginatedTasks.length === 0 && (
-            <div className="col-span-2 bg-white rounded-lg shadow p-8 text-center">
-              <p className="text-slate-500">No tasks found. Create a new task to get started.</p>
-            </div>
-          )}
-        </div>
-
-        {totalPages > 1 && (
-          <Pagination className="mt-4">
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious 
-                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                  className={currentPage === 1 ? 'pointer-events-none opacity-50' : ''}
-                />
-              </PaginationItem>
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                <PaginationItem key={page}>
-                  <PaginationLink
-                    onClick={() => setCurrentPage(page)}
-                    isActive={currentPage === page}
-                  >
-                    {page}
-                  </PaginationLink>
-                </PaginationItem>
-              ))}
-              <PaginationItem>
-                <PaginationNext 
-                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                  className={currentPage === totalPages ? 'pointer-events-none opacity-50' : ''}
-                />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
-        )}
-      </div>
-    );
-  };
-
-  const renderTodaysTasks = () => {
-    return (
-      <div className="space-y-6">
-        <div className="flex items-center gap-4">
-          <Button 
-            variant="ghost" 
-            onClick={() => setActiveTab('dashboard')}
-            className="hover:bg-blue-50 text-blue-600"
-          >
-            ← Back
-          </Button>
-          <h1 className="text-3xl font-bold text-slate-900">Today's Tasks</h1>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {todaysTasks.length > 0 ? (
-            todaysTasks.map((task) => (
-              <TaskCardPremium 
-                key={task.id} 
-                task={task} 
-                employees={employees}
-                onTaskClick={handleTaskClick}
-                onEmployeeClick={handleEmployeeClick}
-                onTaskUpdate={handleTaskUpdate}
-              />
-            ))
-          ) : (
-            <div className="col-span-2 bg-white rounded-lg shadow p-8 text-center">
-              <p className="text-slate-500">No tasks due today.</p>
-            </div>
-          )}
-        </div>
-      </div>
-    );
-  };
-
-  const renderCompletedTasks = () => {
-    return (
-      <div className="space-y-6">
-        <div className="flex items-center gap-4">
-          <Button 
-            variant="ghost" 
-            onClick={() => setActiveTab('dashboard')}
-            className="hover:bg-blue-50 text-blue-600"
-          >
-            ← Back
-          </Button>
-          <h1 className="text-3xl font-bold text-slate-900">Completed Tasks</h1>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {completedTasksData.length > 0 ? (
-            completedTasksData.map((task) => (
-              <TaskCardPremium 
-                key={task.id} 
-                task={task} 
-                employees={employees}
-                onTaskClick={handleTaskClick}
-                onEmployeeClick={handleEmployeeClick}
-                onTaskUpdate={handleTaskUpdate}
-              />
-            ))
-          ) : (
-            <div className="col-span-2 bg-white rounded-lg shadow p-8 text-center">
-              <p className="text-slate-500">No completed tasks yet.</p>
-            </div>
-          )}
-        </div>
-      </div>
-    );
-  };
-
-  const renderFutureTasks = () => {
-    return (
-      <div className="space-y-6">
-        <div className="flex items-center gap-4">
-          <Button 
-            variant="ghost" 
-            onClick={() => setActiveTab('dashboard')}
-            className="hover:bg-blue-50 text-blue-600"
-          >
-            ← Back
-          </Button>
-          <h1 className="text-3xl font-bold text-slate-900">Future Tasks</h1>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {futureTasks.length > 0 ? (
-            futureTasks.map((task) => (
-              <TaskCardPremium 
-                key={task.id} 
-                task={task} 
-                employees={employees}
-                onTaskClick={handleTaskClick}
-                onEmployeeClick={handleEmployeeClick}
-                onTaskUpdate={handleTaskUpdate}
-              />
-            ))
-          ) : (
-            <div className="col-span-2 bg-white rounded-lg shadow p-8 text-center">
-              <p className="text-slate-500">No future tasks scheduled.</p>
-            </div>
-          )}
-        </div>
-      </div>
-    );
-  };
-
-  const renderEmployees = () => {
-    const paginatedEmployees = paginateItems(employees);
-    const totalPages = Math.ceil(employees.length / itemsPerPage);
-
-    return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Button 
-              variant="ghost" 
-              onClick={() => setActiveTab('dashboard')}
-              className="hover:bg-blue-50 text-blue-600"
-            >
-              ← Back
-            </Button>
-            <h1 className="text-3xl font-bold text-slate-900">Employees</h1>
-          </div>
-          <Button onClick={() => setShowEmployeeForm(true)}>
-            <Plus className="mr-2 h-4 w-4" />
-            Add Employee
-          </Button>
-        </div>
-
-        <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
-          <div className="w-full sm:w-auto">
-            <Input
-              placeholder="Search employees..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full sm:w-80"
-            />
-          </div>
-          <div className="flex gap-2 w-full sm:w-auto">
-            <Button variant="outline" onClick={() => handleExport('employees')}>
-              <Download className="mr-2 h-4 w-4" />
-              Export
-            </Button>
-            <Button variant="outline" onClick={() => fileInputRef.current?.click()}>
-              <Upload className="mr-2 h-4 w-4" />
-              Import
-            </Button>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-lg shadow overflow-hidden">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Position</TableHead>
-                <TableHead>Department</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Created Date</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {paginatedEmployees.map((employee) => (
-                <TableRow key={employee.id} className="hover:bg-slate-50">
-                  <TableCell className="font-medium">
-                    <button 
-                      onClick={() => navigate(`/user/${employee.id}`)}
-                      className="text-blue-600 hover:text-blue-800 hover:underline font-medium"
-                    >
-                      {employee.name}
-                    </button>
-                  </TableCell>
-                  <TableCell>{employee.position}</TableCell>
-                  <TableCell>{employee.department}</TableCell>
-                  <TableCell>{employee.email}</TableCell>
-                  <TableCell>{employee.createdDate}</TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      <Button variant="ghost" size="sm" onClick={() => handleEditEmployee(employee)}>
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="sm" onClick={() => handleDeleteEmployee(employee.id)}>
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+          <div className="grid gap-4">
+            {employees.map((employee) => (
+              <Card key={employee.id} className="hover:shadow-lg transition-shadow">
+                <CardContent className="p-6">
+                  <div className="flex items-center space-x-4">
+                    <img
+                      src={employee.avatar}
+                      alt={employee.name}
+                      className="w-12 h-12 rounded-full object-cover"
+                    />
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between">
+                        <button 
+                          onClick={() => navigate(`/user/${employee.id}`)}
+                          className="text-blue-600 hover:text-blue-800 hover:underline font-medium"
+                        >
+                          {employee.name}
+                        </button>
+                        <Badge variant="secondary">{employee.department}</Badge>
+                      </div>
+                      <p className="text-slate-600 text-sm">{employee.position}</p>
+                      <p className="text-slate-500 text-xs">{employee.email}</p>
+                      <div className="flex flex-wrap gap-1 mt-2">
+                        {employee.skills.map((skill) => (
+                          <Badge key={skill} variant="outline" className="text-xs">
+                            {skill}
+                          </Badge>
+                        ))}
+                      </div>
                     </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-              {paginatedEmployees.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={6} className="text-center py-8 text-slate-500">
-                    No employees found. Add an employee to get started.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    if (activeTab.startsWith('tasks-') || activeTab === 'tasks') {
+      const filteredTasks = getFilteredTasks();
+      const tabTitles = {
+        'tasks-today': "Today's Tasks",
+        'tasks-all': 'All Tasks',
+        'tasks-completed': 'Completed Tasks',
+        'tasks-future': 'Future Tasks',
+        'tasks': 'All Tasks'
+      };
+
+      return (
+        <div className="space-y-6">
+          <div className="flex justify-between items-center">
+            <h2 className="text-2xl font-bold text-slate-800">
+              {tabTitles[activeTab as keyof typeof tabTitles]}
+            </h2>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700">
+                  <Plus className="mr-2 h-4 w-4" />
+                  Create Task
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-md">
+                <DialogHeader>
+                  <DialogTitle>Create New Task</DialogTitle>
+                </DialogHeader>
+                <TaskForm onSubmit={handleAddTask} employees={employees} />
+              </DialogContent>
+            </Dialog>
+          </div>
+
+          <div className="grid gap-4">
+            {filteredTasks.map((task) => (
+              <TaskCard 
+                key={task.id} 
+                task={task} 
+                onUpdate={(updates) => handleTaskUpdate(task.id, updates)}
+              />
+            ))}
+            {filteredTasks.length === 0 && (
+              <Card className="p-8 text-center">
+                <p className="text-slate-500">No tasks found for this category.</p>
+              </Card>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    // Dashboard content
+    return (
+      <div className="space-y-8">
+        {/* Enhanced Dashboard Header */}
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+              TaskFlow Dashboard
+            </h1>
+            <p className="text-slate-600 mt-1">Welcome back! Here's what's happening with your projects today.</p>
+          </div>
+          <div className="flex gap-3">
+            <Button variant="outline" className="shadow-sm">
+              <Filter className="mr-2 h-4 w-4" />
+              Filter
+            </Button>
+            <Button variant="outline" className="shadow-sm">
+              <Download className="mr-2 h-4 w-4" />
+              Export
+            </Button>
+            <Button onClick={() => navigate('/analytics')} className="bg-gradient-to-r from-purple-600 to-indigo-600 shadow-lg">
+              <BarChart3 className="mr-2 h-4 w-4" />
+              View Analytics
+            </Button>
+          </div>
         </div>
 
-        {totalPages > 1 && (
-          <Pagination className="mt-4">
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious 
-                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                  className={currentPage === 1 ? 'pointer-events-none opacity-50' : ''}
-                />
-              </PaginationItem>
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                <PaginationItem key={page}>
-                  <PaginationLink
-                    onClick={() => setCurrentPage(page)}
-                    isActive={currentPage === page}
-                  >
-                    {page}
-                  </PaginationLink>
-                </PaginationItem>
+        {/* Premium Status Banner */}
+        <Card className="bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 shadow-lg">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Star className="h-8 w-8 text-yellow-500" />
+                <div>
+                  <h3 className="text-lg font-semibold text-yellow-800">TaskFlow Premium</h3>
+                  <p className="text-yellow-700 text-sm">You're using our premium analytics suite with advanced insights</p>
+                </div>
+              </div>
+              <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white shadow-lg">
+                🚀 PREMIUM
+              </Badge>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Enhanced Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-xl hover:shadow-2xl transition-all duration-300">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-blue-100 text-sm">Total Tasks</p>
+                  <p className="text-3xl font-bold">{tasks.length}</p>
+                  <p className="text-blue-100 text-xs mt-1">+12% from last month</p>
+                </div>
+                <BarChart3 className="h-12 w-12 text-blue-200" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-green-500 to-emerald-600 text-white shadow-xl hover:shadow-2xl transition-all duration-300">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-green-100 text-sm">Completed</p>
+                  <p className="text-3xl font-bold">{tasks.filter(t => t.status === 'completed').length}</p>
+                  <p className="text-green-100 text-xs mt-1">+8% completion rate</p>
+                </div>
+                <CheckCircle className="h-12 w-12 text-green-200" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-orange-500 to-red-500 text-white shadow-xl hover:shadow-2xl transition-all duration-300">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-orange-100 text-sm">In Progress</p>
+                  <p className="text-3xl font-bold">{tasks.filter(t => t.status === 'in-progress').length}</p>
+                  <p className="text-orange-100 text-xs mt-1">Active workload</p>
+                </div>
+                <Clock className="h-12 w-12 text-orange-200" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-purple-500 to-indigo-600 text-white shadow-xl hover:shadow-2xl transition-all duration-300">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-purple-100 text-sm">Team Members</p>
+                  <p className="text-3xl font-bold">{employees.length}</p>
+                  <p className="text-purple-100 text-xs mt-1">Active workforce</p>
+                </div>
+                <Users className="h-12 w-12 text-purple-200" />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Quick Actions */}
+        <Card className="shadow-xl">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Zap className="h-5 w-5 text-yellow-500" />
+              Quick Actions
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button className="h-16 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700">
+                    <Plus className="mr-2 h-5 w-5" />
+                    Create New Task
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>Create New Task</DialogTitle>
+                  </DialogHeader>
+                  <TaskForm onSubmit={handleAddTask} employees={employees} />
+                </DialogContent>
+              </Dialog>
+
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="outline" className="h-16 hover:bg-purple-50">
+                    <Users className="mr-2 h-5 w-5" />
+                    Add Employee
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>Add New Employee</DialogTitle>
+                  </DialogHeader>
+                  <EmployeeForm onSubmit={handleAddEmployee} />
+                </DialogContent>
+              </Dialog>
+
+              <Button 
+                variant="outline" 
+                className="h-16 hover:bg-green-50"
+                onClick={() => navigate('/analytics')}
+              >
+                <BarChart3 className="mr-2 h-5 w-5" />
+                View Analytics
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Recent Tasks Preview */}
+        <Card className="shadow-xl">
+          <CardHeader>
+            <div className="flex justify-between items-center">
+              <CardTitle className="flex items-center gap-2">
+                <Target className="h-5 w-5 text-blue-600" />
+                Recent Tasks
+              </CardTitle>
+              <Button 
+                variant="outline" 
+                onClick={() => setActiveTab('tasks-all')}
+                className="text-blue-600 hover:bg-blue-50"
+              >
+                View All Tasks
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {tasks.slice(0, 3).map((task) => (
+                <div key={task.id} className="flex items-center justify-between p-4 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">
+                  <div className="flex items-center space-x-3">
+                    <div className={`w-3 h-3 rounded-full ${
+                      task.status === 'completed' ? 'bg-green-500' :
+                      task.status === 'in-progress' ? 'bg-blue-500' : 'bg-slate-400'
+                    }`} />
+                    <div>
+                      <h4 className="font-medium text-slate-800">{task.title}</h4>
+                      <p className="text-sm text-slate-500">Assigned to {task.assignedTo}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Badge variant={
+                      task.priority === 'high' ? 'destructive' :
+                      task.priority === 'medium' ? 'default' : 'secondary'
+                    }>
+                      {task.priority}
+                    </Badge>
+                    <span className="text-sm text-slate-500">{task.dueDate}</span>
+                  </div>
+                </div>
               ))}
-              <PaginationItem>
-                <PaginationNext 
-                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                  className={currentPage === totalPages ? 'pointer-events-none opacity-50' : ''}
-                />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
-        )}
+            </div>
+          </CardContent>
+        </Card>
       </div>
     );
   };
-
-  const renderAnalytics = () => (
-    <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <Button 
-          variant="ghost" 
-          onClick={() => setActiveTab('dashboard')}
-          className="hover:bg-blue-50 text-blue-600"
-        >
-          ← Back
-        </Button>
-        <h1 className="text-3xl font-bold text-slate-900">Analytics</h1>
-      </div>
-      <div className="bg-white rounded-lg shadow p-8 text-center">
-        <p className="text-slate-500">Analytics dashboard coming soon...</p>
-      </div>
-    </div>
-  );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50/30 flex w-full">
-      <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
-      
-      <div className="flex-1 p-8 overflow-auto">
-        {activeTab === 'dashboard' && renderDashboard()}
-        {activeTab === 'tasks-all' && renderTasks()}
-        {activeTab === 'tasks-today' && renderTodaysTasks()}
-        {activeTab === 'tasks-completed' && renderCompletedTasks()}
-        {activeTab === 'tasks-future' && renderFutureTasks()}
-        {activeTab === 'employees' && renderEmployees()}
-        {activeTab === 'analytics' && renderAnalytics()}
-        
-        {/* Forms */}
-        {showTaskForm && (
-          <TaskForm 
-            onClose={() => {
-              setShowTaskForm(false);
-              setEditingTask(null);
-            }}
-            onSubmit={handleTaskSubmit}
-            employees={employees}
-            task={editingTask || undefined}
-          />
-        )}
-        
-        {showEmployeeForm && (
-          <EmployeeForm 
-            onClose={() => {
-              setShowEmployeeForm(false);
-              setEditingEmployee(null);
-            }}
-            onSubmit={handleEmployeeSubmit}
-            employee={editingEmployee || undefined}
-          />
-        )}
-        
-        <input
-          type="file"
-          ref={fileInputRef}
-          onChange={handleImport}
-          accept=".csv"
-          style={{ display: 'none' }}
-        />
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+      <div className="flex w-full">
+        <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
+        <main className="flex-1 p-8">
+          {renderContent()}
+        </main>
       </div>
     </div>
   );
