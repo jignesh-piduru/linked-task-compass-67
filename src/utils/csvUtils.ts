@@ -1,43 +1,66 @@
-
 import { Employee } from '@/types/Employee';
 import { Task } from '@/types/Task';
 
-export const exportToCSV = (data: any[], filename: string) => {
-  if (data.length === 0) return;
+export const csvUtils = {
+  exportToCSV: (data: any[], filename: string) => {
+    if (data.length === 0) return;
 
-  const headers = Object.keys(data[0]);
-  const csvContent = [
-    headers.join(','),
-    ...data.map(row =>
-      headers.map(header => {
-        const cell = row[header];
-        // Handle nested objects like toolLinks
-        if (Array.isArray(cell)) {
-          return `"${cell.map(item => typeof item === 'object' ? JSON.stringify(item) : item).join('; ')}"`;
-        }
-        if (typeof cell === 'string' && cell.includes(',')) {
-          return `"${cell}"`;
-        }
-        return cell || '';
-      }).join(',')
-    )
-  ].join('\n');
+    const headers = Object.keys(data[0]);
+    const csvContent = [
+      headers.join(','),
+      ...data.map(row =>
+        headers.map(header => {
+          const cell = row[header];
+          // Handle nested objects like toolLinks
+          if (Array.isArray(cell)) {
+            return `"${cell.map(item => typeof item === 'object' ? JSON.stringify(item) : item).join('; ')}"`;
+          }
+          if (typeof cell === 'string' && cell.includes(',')) {
+            return `"${cell}"`;
+          }
+          return cell || '';
+        }).join(',')
+      )
+    ].join('\n');
 
-  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-  const link = document.createElement('a');
-  
-  if (link.download !== undefined) {
-    const url = URL.createObjectURL(blob);
-    link.setAttribute('href', url);
-    link.setAttribute('download', filename);
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    
+    if (link.download !== undefined) {
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', filename);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  },
+
+  importFromCSV: (file: File, callback: (data: any[]) => void) => {
+    const reader = new FileReader();
+    
+    reader.onload = (e) => {
+      try {
+        const content = e.target?.result as string;
+        const data = parseCSV(content);
+        callback(data);
+      } catch (error) {
+        console.error('Error parsing CSV:', error);
+        callback([]);
+      }
+    };
+    
+    reader.onerror = () => {
+      console.error('Error reading file');
+      callback([]);
+    };
+    
+    reader.readAsText(file);
   }
 };
 
-export const parseCSV = (csvContent: string): any[] => {
+const parseCSV = (csvContent: string): any[] => {
   const lines = csvContent.split('\n').filter(line => line.trim());
   if (lines.length < 2) return [];
 
@@ -96,36 +119,6 @@ const parseCSVLine = (line: string): string[] => {
   
   result.push(current);
   return result;
-};
-
-export const handleFileImport = (
-  file: File, 
-  onSuccess: (data: any[]) => void, 
-  onError: (error: string) => void
-) => {
-  const reader = new FileReader();
-  
-  reader.onload = (e) => {
-    try {
-      const content = e.target?.result as string;
-      const data = parseCSV(content);
-      
-      if (data.length === 0) {
-        onError('No valid data found in the file');
-        return;
-      }
-      
-      onSuccess(data);
-    } catch (error) {
-      onError('Error parsing file: ' + (error as Error).message);
-    }
-  };
-  
-  reader.onerror = () => {
-    onError('Error reading file');
-  };
-  
-  reader.readAsText(file);
 };
 
 export const validateEmployeeData = (data: any[]): Employee[] => {

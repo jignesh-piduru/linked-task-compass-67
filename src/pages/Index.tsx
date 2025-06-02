@@ -1,3 +1,4 @@
+
 import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -30,167 +31,111 @@ const Index = () => {
   const [filterStatus, setFilterStatus] = useState('all');
   const itemsPerPage = 10;
 
-  // Sample data
+  // Sample data with correct types
   const [tasks, setTasks] = useState<Task[]>([
     {
-      id: 1,
-      title: "Implement user authentication",
-      description: "Set up login and registration functionality",
-      status: "in-progress",
-      priority: "high",
-      assignee: "John Doe",
-      assigneeId: 1,
-      dueDate: "2024-01-15",
-      createdDate: "2024-01-01",
-      estimatedHours: 16,
-      actualHours: 8,
-      completionPercentage: 60,
-      subtasks: [
-        { id: 101, title: "Create login form", completed: true },
-        { id: 102, title: "Implement password validation", completed: true },
-        { id: 103, title: "Add forgot password feature", completed: false },
-      ]
+      id: '1',
+      employeeName: 'John Doe',
+      taskName: 'Implement user authentication',
+      description: 'Set up login and registration functionality',
+      category: 'Product',
+      startDate: '2024-01-01',
+      estimatedEndDate: '2024-01-15',
+      toolLinks: []
     },
     {
-      id: 2,
-      title: "Design database schema",
-      description: "Create ERD and define relationships between entities",
-      status: "completed",
-      priority: "medium",
-      assignee: "Jane Smith",
-      assigneeId: 2,
-      dueDate: "2024-01-10",
-      createdDate: "2024-01-02",
-      estimatedHours: 8,
-      actualHours: 6,
-      completionPercentage: 100,
-      subtasks: [
-        { id: 201, title: "Define user table", completed: true },
-        { id: 202, title: "Define product table", completed: true },
-        { id: 203, title: "Define order table", completed: true },
-      ]
+      id: '2',
+      employeeName: 'Jane Smith',
+      taskName: 'Design database schema',
+      description: 'Create ERD and define relationships between entities',
+      category: 'Product',
+      startDate: '2024-01-02',
+      estimatedEndDate: '2024-01-10',
+      actualEndDate: '2024-01-09',
+      toolLinks: []
     },
     {
-      id: 3,
-      title: "Implement API endpoints",
-      description: "Create RESTful API endpoints for the application",
-      status: "not-started",
-      priority: "high",
-      assignee: "Mike Johnson",
-      assigneeId: 3,
-      dueDate: "2024-01-20",
-      createdDate: "2024-01-03",
-      estimatedHours: 24,
-      actualHours: 0,
-      completionPercentage: 0,
-      subtasks: [
-        { id: 301, title: "User endpoints", completed: false },
-        { id: 302, title: "Product endpoints", completed: false },
-        { id: 303, title: "Order endpoints", completed: false },
-      ]
+      id: '3',
+      employeeName: 'Mike Johnson',
+      taskName: 'Implement API endpoints',
+      description: 'Create RESTful API endpoints for the application',
+      category: 'R&D',
+      startDate: '2024-01-03',
+      estimatedEndDate: '2024-01-20',
+      toolLinks: []
     },
     {
-      id: 4,
-      title: "Write unit tests",
-      description: "Create comprehensive test suite for all components",
-      status: "in-progress",
-      priority: "medium",
-      assignee: "Sarah Williams",
-      assigneeId: 4,
-      dueDate: "2024-01-25",
-      createdDate: "2024-01-04",
-      estimatedHours: 16,
-      actualHours: 4,
-      completionPercentage: 25,
-      subtasks: [
-        { id: 401, title: "Auth tests", completed: true },
-        { id: 402, title: "API tests", completed: false },
-        { id: 403, title: "UI tests", completed: false },
-      ]
+      id: '4',
+      employeeName: 'Sarah Williams',
+      taskName: 'Write unit tests',
+      description: 'Create comprehensive test suite for all components',
+      category: 'Product',
+      startDate: '2024-01-04',
+      estimatedEndDate: '2024-01-25',
+      toolLinks: []
     },
     {
-      id: 5,
-      title: "Deploy to staging",
-      description: "Set up CI/CD pipeline and deploy to staging environment",
-      status: "not-started",
-      priority: "low",
-      assignee: "John Doe",
-      assigneeId: 1,
-      dueDate: "2024-01-30",
-      createdDate: "2024-01-05",
-      estimatedHours: 8,
-      actualHours: 0,
-      completionPercentage: 0,
-      subtasks: [
-        { id: 501, title: "Configure CI/CD", completed: false },
-        { id: 502, title: "Set up staging environment", completed: false },
-        { id: 503, title: "Deploy application", completed: false },
-      ]
+      id: '5',
+      employeeName: 'John Doe',
+      taskName: 'Deploy to staging',
+      description: 'Set up CI/CD pipeline and deploy to staging environment',
+      category: 'Product',
+      startDate: '2024-01-05',
+      estimatedEndDate: '2024-01-30',
+      toolLinks: []
     }
   ]);
 
   const [employees, setEmployees] = useState<Employee[]>([
     {
-      id: 1,
-      name: "John Doe",
-      email: "john@company.com",
-      position: "Senior Developer",
-      department: "Engineering",
-      salary: 95000,
-      hireDate: "2022-03-15",
-      phone: "+1 (555) 123-4567",
-      address: "123 Main St, City, State 12345"
+      id: '1',
+      name: 'John Doe',
+      email: 'john@company.com',
+      position: 'Senior Developer',
+      department: 'Engineering',
+      createdDate: '2022-03-15'
     },
     {
-      id: 2,
-      name: "Jane Smith",
-      email: "jane@company.com",
-      position: "UX Designer",
-      department: "Design",
-      salary: 85000,
-      hireDate: "2022-05-10",
-      phone: "+1 (555) 234-5678",
-      address: "456 Oak Ave, City, State 12345"
+      id: '2',
+      name: 'Jane Smith',
+      email: 'jane@company.com',
+      position: 'UX Designer',
+      department: 'Design',
+      createdDate: '2022-05-10'
     },
     {
-      id: 3,
-      name: "Mike Johnson",
-      email: "mike@company.com",
-      position: "Product Manager",
-      department: "Product",
-      salary: 105000,
-      hireDate: "2021-11-20",
-      phone: "+1 (555) 345-6789",
-      address: "789 Pine St, City, State 12345"
+      id: '3',
+      name: 'Mike Johnson',
+      email: 'mike@company.com',
+      position: 'Product Manager',
+      department: 'Product',
+      createdDate: '2021-11-20'
     },
     {
-      id: 4,
-      name: "Sarah Williams",
-      email: "sarah@company.com",
-      position: "QA Engineer",
-      department: "Engineering",
-      salary: 80000,
-      hireDate: "2023-01-05",
-      phone: "+1 (555) 456-7890",
-      address: "101 Elm St, City, State 12345"
+      id: '4',
+      name: 'Sarah Williams',
+      email: 'sarah@company.com',
+      position: 'QA Engineer',
+      department: 'Engineering',
+      createdDate: '2023-01-05'
     }
   ]);
 
   // Dashboard metrics
   const totalTasks = tasks.length;
-  const inProgressTasks = tasks.filter(task => task.status === 'in-progress').length;
-  const completedTasks = tasks.filter(task => task.status === 'completed').length;
+  const inProgressTasks = tasks.filter(task => !task.actualEndDate && new Date(task.estimatedEndDate) >= new Date()).length;
+  const completedTasks = tasks.filter(task => task.actualEndDate).length;
   const totalEmployees = employees.length;
   
   const todaysTasks = tasks.filter(task => {
     const today = new Date().toISOString().split('T')[0];
-    return task.dueDate === today;
+    return task.estimatedEndDate === today;
   });
 
-  const completedTasksData = tasks.filter(task => task.status === 'completed');
+  const completedTasksData = tasks.filter(task => task.actualEndDate);
   const futureTasks = tasks.filter(task => {
     const today = new Date().toISOString().split('T')[0];
-    return task.dueDate > today;
+    return task.estimatedEndDate > today;
   });
 
   // Utility functions
@@ -199,14 +144,10 @@ const Index = () => {
     
     if (searchTerm) {
       filtered = filtered.filter(task => 
-        task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        task.taskName.toLowerCase().includes(searchTerm.toLowerCase()) ||
         task.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        task.assignee.toLowerCase().includes(searchTerm.toLowerCase())
+        task.employeeName.toLowerCase().includes(searchTerm.toLowerCase())
       );
-    }
-    
-    if (filterStatus !== 'all') {
-      filtered = filtered.filter(task => task.status === filterStatus);
     }
     
     return filtered;
@@ -218,40 +159,39 @@ const Index = () => {
   };
 
   // Event handlers
-  const handleTaskSubmit = (task: Task) => {
+  const handleTaskSubmit = (task: Omit<Task, 'id'>) => {
     if (editingTask) {
-      setTasks(tasks.map(t => t.id === task.id ? task : t));
+      setTasks(tasks.map(t => t.id === editingTask.id ? { ...task, id: editingTask.id } : t));
       toast({
         title: "Task updated",
-        description: `Task "${task.title}" has been updated.`,
+        description: `Task "${task.taskName}" has been updated.`,
       });
     } else {
-      const newTask = {
+      const newTask: Task = {
         ...task,
-        id: tasks.length + 1,
-        createdDate: new Date().toISOString().split('T')[0],
+        id: (tasks.length + 1).toString(),
       };
       setTasks([...tasks, newTask]);
       toast({
         title: "Task created",
-        description: `Task "${task.title}" has been created.`,
+        description: `Task "${task.taskName}" has been created.`,
       });
     }
     setShowTaskForm(false);
     setEditingTask(null);
   };
 
-  const handleEmployeeSubmit = (employee: Employee) => {
+  const handleEmployeeSubmit = (employee: Omit<Employee, 'id'>) => {
     if (editingEmployee) {
-      setEmployees(employees.map(e => e.id === employee.id ? employee : e));
+      setEmployees(employees.map(e => e.id === editingEmployee.id ? { ...employee, id: editingEmployee.id } : e));
       toast({
         title: "Employee updated",
         description: `Employee "${employee.name}" has been updated.`,
       });
     } else {
-      const newEmployee = {
+      const newEmployee: Employee = {
         ...employee,
-        id: employees.length + 1,
+        id: (employees.length + 1).toString(),
       };
       setEmployees([...employees, newEmployee]);
       toast({
@@ -268,7 +208,7 @@ const Index = () => {
     setShowTaskForm(true);
   };
 
-  const handleDeleteTask = (id: number) => {
+  const handleDeleteTask = (id: string) => {
     setTasks(tasks.filter(task => task.id !== id));
     toast({
       title: "Task deleted",
@@ -281,7 +221,7 @@ const Index = () => {
     setShowEmployeeForm(true);
   };
 
-  const handleDeleteEmployee = (id: number) => {
+  const handleDeleteEmployee = (id: string) => {
     setEmployees(employees.filter(employee => employee.id !== id));
     toast({
       title: "Employee deleted",
@@ -289,12 +229,23 @@ const Index = () => {
     });
   };
 
-  const handleEmployeeClick = (id: number) => {
-    navigate(`/user/${id}`);
+  const handleEmployeeClick = (employeeName: string) => {
+    const employee = employees.find(e => e.name === employeeName);
+    if (employee) {
+      navigate(`/user/${employee.id}`);
+    }
   };
 
-  const handleTaskClick = (id: number) => {
-    navigate(`/task/${id}`);
+  const handleTaskClick = (task: Task) => {
+    navigate(`/task/${task.id}`);
+  };
+
+  const handleTaskUpdate = (updatedTask: Task) => {
+    setTasks(tasks.map(task => task.id === updatedTask.id ? updatedTask : task));
+    toast({
+      title: "Task updated",
+      description: `Task "${updatedTask.taskName}" has been updated.`,
+    });
   };
 
   const handleExport = (type: 'tasks' | 'employees') => {
@@ -312,7 +263,7 @@ const Index = () => {
     if (!file) return;
 
     csvUtils.importFromCSV(file, (data) => {
-      if (data.length > 0 && 'title' in data[0]) {
+      if (data.length > 0 && 'taskName' in data[0]) {
         setTasks([...tasks, ...data as Task[]]);
         toast({
           title: "Import successful",
@@ -449,9 +400,10 @@ const Index = () => {
             <TaskCardPremium 
               key={task.id} 
               task={task} 
-              onEdit={() => handleEditTask(task)}
-              onDelete={() => handleDeleteTask(task.id)}
-              onEmployeeClick={() => handleEmployeeClick(task.assigneeId)}
+              employees={employees}
+              onTaskClick={handleTaskClick}
+              onEmployeeClick={handleEmployeeClick}
+              onTaskUpdate={handleTaskUpdate}
             />
           ))}
         </div>
@@ -484,16 +436,6 @@ const Index = () => {
             />
           </div>
           <div className="flex gap-2 w-full sm:w-auto">
-            <select
-              value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value)}
-              className="border border-slate-300 rounded-md px-3 py-2"
-            >
-              <option value="all">All Statuses</option>
-              <option value="not-started">Not Started</option>
-              <option value="in-progress">In Progress</option>
-              <option value="completed">Completed</option>
-            </select>
             <Button variant="outline" onClick={() => handleExport('tasks')}>
               <Download className="mr-2 h-4 w-4" />
               Export
@@ -505,74 +447,22 @@ const Index = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow overflow-hidden">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Title</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Priority</TableHead>
-                <TableHead>Assignee</TableHead>
-                <TableHead>Due Date</TableHead>
-                <TableHead>Progress</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {paginatedTasks.map((task) => (
-                <TableRow key={task.id} className="cursor-pointer hover:bg-slate-50" onClick={() => handleTaskClick(task.id)}>
-                  <TableCell className="font-medium">{task.title}</TableCell>
-                  <TableCell>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      task.status === 'completed' ? 'bg-green-100 text-green-800' :
-                      task.status === 'in-progress' ? 'bg-blue-100 text-blue-800' :
-                      'bg-slate-100 text-slate-800'
-                    }`}>
-                      {task.status === 'not-started' ? 'Not Started' :
-                       task.status === 'in-progress' ? 'In Progress' : 'Completed'}
-                    </span>
-                  </TableCell>
-                  <TableCell>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      task.priority === 'high' ? 'bg-red-100 text-red-800' :
-                      task.priority === 'medium' ? 'bg-yellow-100 text-yellow-800' :
-                      'bg-green-100 text-green-800'
-                    }`}>
-                      {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
-                    </span>
-                  </TableCell>
-                  <TableCell>{task.assignee}</TableCell>
-                  <TableCell>{task.dueDate}</TableCell>
-                  <TableCell>
-                    <div className="w-full bg-slate-200 rounded-full h-2">
-                      <div
-                        className="bg-blue-600 h-2 rounded-full"
-                        style={{ width: `${task.completionPercentage}%` }}
-                      ></div>
-                    </div>
-                    <span className="text-xs text-slate-500">{task.completionPercentage}%</span>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-2" onClick={(e) => e.stopPropagation()}>
-                      <Button variant="ghost" size="sm" onClick={() => handleEditTask(task)}>
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="sm" onClick={() => handleDeleteTask(task.id)}>
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-              {paginatedTasks.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={7} className="text-center py-8 text-slate-500">
-                    No tasks found. Create a new task to get started.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {paginatedTasks.map((task) => (
+            <TaskCardPremium 
+              key={task.id} 
+              task={task} 
+              employees={employees}
+              onTaskClick={handleTaskClick}
+              onEmployeeClick={handleEmployeeClick}
+              onTaskUpdate={handleTaskUpdate}
+            />
+          ))}
+          {paginatedTasks.length === 0 && (
+            <div className="col-span-2 bg-white rounded-lg shadow p-8 text-center">
+              <p className="text-slate-500">No tasks found. Create a new task to get started.</p>
+            </div>
+          )}
         </div>
 
         {totalPages > 1 && (
@@ -581,7 +471,7 @@ const Index = () => {
               <PaginationItem>
                 <PaginationPrevious 
                   onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                  disabled={currentPage === 1}
+                  className={currentPage === 1 ? 'pointer-events-none opacity-50' : ''}
                 />
               </PaginationItem>
               {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
@@ -597,7 +487,7 @@ const Index = () => {
               <PaginationItem>
                 <PaginationNext 
                   onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                  disabled={currentPage === totalPages}
+                  className={currentPage === totalPages ? 'pointer-events-none opacity-50' : ''}
                 />
               </PaginationItem>
             </PaginationContent>
@@ -617,9 +507,10 @@ const Index = () => {
               <TaskCardPremium 
                 key={task.id} 
                 task={task} 
-                onEdit={() => handleEditTask(task)}
-                onDelete={() => handleDeleteTask(task.id)}
-                onEmployeeClick={() => handleEmployeeClick(task.assigneeId)}
+                employees={employees}
+                onTaskClick={handleTaskClick}
+                onEmployeeClick={handleEmployeeClick}
+                onTaskUpdate={handleTaskUpdate}
               />
             ))
           ) : (
@@ -642,9 +533,10 @@ const Index = () => {
               <TaskCardPremium 
                 key={task.id} 
                 task={task} 
-                onEdit={() => handleEditTask(task)}
-                onDelete={() => handleDeleteTask(task.id)}
-                onEmployeeClick={() => handleEmployeeClick(task.assigneeId)}
+                employees={employees}
+                onTaskClick={handleTaskClick}
+                onEmployeeClick={handleEmployeeClick}
+                onTaskUpdate={handleTaskUpdate}
               />
             ))
           ) : (
@@ -667,9 +559,10 @@ const Index = () => {
               <TaskCardPremium 
                 key={task.id} 
                 task={task} 
-                onEdit={() => handleEditTask(task)}
-                onDelete={() => handleDeleteTask(task.id)}
-                onEmployeeClick={() => handleEmployeeClick(task.assigneeId)}
+                employees={employees}
+                onTaskClick={handleTaskClick}
+                onEmployeeClick={handleEmployeeClick}
+                onTaskUpdate={handleTaskUpdate}
               />
             ))
           ) : (
@@ -725,18 +618,18 @@ const Index = () => {
                 <TableHead>Position</TableHead>
                 <TableHead>Department</TableHead>
                 <TableHead>Email</TableHead>
-                <TableHead>Hire Date</TableHead>
+                <TableHead>Created Date</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {paginatedEmployees.map((employee) => (
-                <TableRow key={employee.id} className="cursor-pointer hover:bg-slate-50" onClick={() => handleEmployeeClick(employee.id)}>
+                <TableRow key={employee.id} className="cursor-pointer hover:bg-slate-50" onClick={() => navigate(`/user/${employee.id}`)}>
                   <TableCell className="font-medium">{employee.name}</TableCell>
                   <TableCell>{employee.position}</TableCell>
                   <TableCell>{employee.department}</TableCell>
                   <TableCell>{employee.email}</TableCell>
-                  <TableCell>{employee.hireDate}</TableCell>
+                  <TableCell>{employee.createdDate}</TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2" onClick={(e) => e.stopPropagation()}>
                       <Button variant="ghost" size="sm" onClick={() => handleEditEmployee(employee)}>
@@ -766,7 +659,7 @@ const Index = () => {
               <PaginationItem>
                 <PaginationPrevious 
                   onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                  disabled={currentPage === 1}
+                  className={currentPage === 1 ? 'pointer-events-none opacity-50' : ''}
                 />
               </PaginationItem>
               {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
@@ -782,7 +675,7 @@ const Index = () => {
               <PaginationItem>
                 <PaginationNext 
                   onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                  disabled={currentPage === totalPages}
+                  className={currentPage === totalPages ? 'pointer-events-none opacity-50' : ''}
                 />
               </PaginationItem>
             </PaginationContent>
@@ -823,7 +716,7 @@ const Index = () => {
             }}
             onSubmit={handleTaskSubmit}
             employees={employees}
-            editingTask={editingTask}
+            task={editingTask || undefined}
           />
         )}
         
@@ -834,7 +727,7 @@ const Index = () => {
               setEditingEmployee(null);
             }}
             onSubmit={handleEmployeeSubmit}
-            editingEmployee={editingEmployee}
+            employee={editingEmployee || undefined}
           />
         )}
         
