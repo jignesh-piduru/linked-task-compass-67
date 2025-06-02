@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -224,17 +225,17 @@ const Index = () => {
     toolLinks: []
   });
 
-  // Employee form state
+  // Employee form state with proper typing
   const [employeeFormData, setEmployeeFormData] = useState({
     name: '',
     email: '',
     department: 'Engineering',
     position: '',
     createdDate: new Date().toISOString().split('T')[0],
-    status: 'active',
-    role: 'employee',
+    status: 'active' as 'active' | 'inactive' | 'on-leave',
+    role: 'employee' as 'admin' | 'manager' | 'employee',
     premiumAccess: false,
-    skills: []
+    skills: [] as string[]
   });
 
   const { toast } = useToast();
