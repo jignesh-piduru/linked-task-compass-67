@@ -281,39 +281,7 @@ const Index = () => {
             </h1>
             <p className="text-slate-600 mt-1">Welcome back! Here's what's happening with your projects today.</p>
           </div>
-          <div className="flex gap-3">
-            <Button variant="outline" className="shadow-sm">
-              <Filter className="mr-2 h-4 w-4" />
-              Filter
-            </Button>
-            <Button variant="outline" className="shadow-sm">
-              <Download className="mr-2 h-4 w-4" />
-              Export
-            </Button>
-            <Button onClick={() => navigate('/analytics')} className="bg-gradient-to-r from-purple-600 to-indigo-600 shadow-lg">
-              <BarChart3 className="mr-2 h-4 w-4" />
-              View Analytics
-            </Button>
-          </div>
         </div>
-
-        {/* Premium Status Banner */}
-        <Card className="bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 shadow-lg">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <Star className="h-8 w-8 text-yellow-500" />
-                <div>
-                  <h3 className="text-lg font-semibold text-yellow-800">TaskFlow Premium</h3>
-                  <p className="text-yellow-700 text-sm">You're using our premium analytics suite with advanced insights</p>
-                </div>
-              </div>
-              <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white shadow-lg">
-                🚀 PREMIUM
-              </Badge>
-            </div>
-          </CardContent>
-        </Card>
 
         {/* Enhanced Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -379,7 +347,7 @@ const Index = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <TaskForm 
                 onSubmit={handleAddTask} 
                 employees={employees}
@@ -390,15 +358,6 @@ const Index = () => {
                 onSubmit={handleAddEmployee}
                 onClose={() => {}}
               />
-
-              <Button 
-                variant="outline" 
-                className="h-16 hover:bg-green-50"
-                onClick={() => navigate('/analytics')}
-              >
-                <BarChart3 className="mr-2 h-5 w-5" />
-                View Analytics
-              </Button>
             </div>
           </CardContent>
         </Card>
