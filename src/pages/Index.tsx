@@ -1,12 +1,8 @@
+
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { 
@@ -38,42 +34,40 @@ const Index = () => {
   const [tasks, setTasks] = useState<Task[]>([
     {
       id: '1',
-      title: 'Design System Implementation',
+      taskName: 'Design System Implementation',
       description: 'Create a comprehensive design system for the application',
-      status: 'in-progress',
-      priority: 'high',
-      assignedTo: 'John Doe',
-      dueDate: '2024-02-15',
-      tags: ['design', 'frontend'],
-      estimatedHours: 40,
-      actualHours: 15,
-      completionPercentage: 60
+      category: 'Product',
+      employeeName: 'John Doe',
+      startDate: '2024-01-15',
+      estimatedEndDate: '2024-02-15',
+      actualEndDate: '',
+      toolLinks: [
+        { id: '1', name: 'Figma Design', url: 'https://figma.com/design-system' }
+      ]
     },
     {
       id: '2',
-      title: 'API Integration',
+      taskName: 'API Integration',
       description: 'Integrate the new payment API endpoints',
-      status: 'todo',
-      priority: 'medium',
-      assignedTo: 'Jane Smith',
-      dueDate: '2024-02-20',
-      tags: ['backend', 'api'],
-      estimatedHours: 25,
-      actualHours: 0,
-      completionPercentage: 0
+      category: 'Development',
+      employeeName: 'Jane Smith',
+      startDate: '2024-01-20',
+      estimatedEndDate: '2024-02-20',
+      actualEndDate: '',
+      toolLinks: [
+        { id: '2', name: 'API Documentation', url: 'https://api-docs.example.com' }
+      ]
     },
     {
       id: '3',
-      title: 'Database Optimization',
+      taskName: 'Database Optimization',
       description: 'Optimize database queries for better performance',
-      status: 'completed',
-      priority: 'high',
-      assignedTo: 'Mike Johnson',
-      dueDate: '2024-02-10',
-      tags: ['database', 'performance'],
-      estimatedHours: 30,
-      actualHours: 28,
-      completionPercentage: 100
+      category: 'Product',
+      employeeName: 'Mike Johnson',
+      startDate: '2024-01-10',
+      estimatedEndDate: '2024-02-10',
+      actualEndDate: '2024-02-08',
+      toolLinks: []
     }
   ]);
 
@@ -84,8 +78,7 @@ const Index = () => {
       email: 'john.doe@company.com',
       department: 'Engineering',
       position: 'Senior Developer',
-      skills: ['React', 'TypeScript', 'Node.js'],
-      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'
+      skills: ['React', 'TypeScript', 'Node.js']
     },
     {
       id: '2',
@@ -93,8 +86,7 @@ const Index = () => {
       email: 'jane.smith@company.com',
       department: 'Design',
       position: 'UX Designer',
-      skills: ['Figma', 'Sketch', 'User Research'],
-      avatar: 'https://images.unsplash.com/photo-1494790108755-2616b68b3c3a?w=150&h=150&fit=crop&crop=face'
+      skills: ['Figma', 'Sketch', 'User Research']
     },
     {
       id: '3',
@@ -102,8 +94,7 @@ const Index = () => {
       email: 'mike.johnson@company.com',
       department: 'Engineering',
       position: 'Backend Developer',
-      skills: ['Python', 'PostgreSQL', 'Docker'],
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face'
+      skills: ['Python', 'PostgreSQL', 'Docker']
     }
   ]);
 
@@ -134,13 +125,21 @@ const Index = () => {
     });
   };
 
-  const handleTaskUpdate = (taskId: string, updates: Partial<Task>) => {
+  const handleTaskUpdate = (updatedTask: Task) => {
     setTasks(tasks.map(task => 
-      task.id === taskId ? { ...task, ...updates } : task
+      task.id === updatedTask.id ? updatedTask : task
     ));
     toast({
       title: "Task updated",
       description: "Task has been successfully updated.",
+    });
+  };
+
+  const handleTaskDelete = (taskId: string) => {
+    setTasks(tasks.filter(task => task.id !== taskId));
+    toast({
+      title: "Task deleted",
+      description: "Task has been successfully deleted.",
     });
   };
 
@@ -149,11 +148,11 @@ const Index = () => {
     
     switch (activeTab) {
       case 'tasks-today':
-        return tasks.filter(task => task.dueDate === today);
+        return tasks.filter(task => task.estimatedEndDate === today);
       case 'tasks-completed':
-        return tasks.filter(task => task.status === 'completed');
+        return tasks.filter(task => !!task.actualEndDate);
       case 'tasks-future':
-        return tasks.filter(task => task.dueDate > today);
+        return tasks.filter(task => task.estimatedEndDate > today);
       case 'tasks-all':
       case 'tasks':
         return tasks;
@@ -174,20 +173,11 @@ const Index = () => {
         <div className="space-y-6">
           <div className="flex justify-between items-center">
             <h2 className="text-2xl font-bold text-slate-800">Employee Management</h2>
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700">
-                  <Plus className="mr-2 h-4 w-4" />
-                  Add Employee
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-md">
-                <DialogHeader>
-                  <DialogTitle>Add New Employee</DialogTitle>
-                </DialogHeader>
-                <EmployeeForm onSubmit={handleAddEmployee} />
-              </DialogContent>
-            </Dialog>
+            <TaskForm 
+              onSubmit={handleAddEmployee}
+              onClose={() => {}}
+              isEmployee={true}
+            />
           </div>
 
           <div className="grid gap-4">
@@ -195,11 +185,9 @@ const Index = () => {
               <Card key={employee.id} className="hover:shadow-lg transition-shadow">
                 <CardContent className="p-6">
                   <div className="flex items-center space-x-4">
-                    <img
-                      src={employee.avatar}
-                      alt={employee.name}
-                      className="w-12 h-12 rounded-full object-cover"
-                    />
+                    <div className="w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center text-white font-semibold">
+                      {employee.name.split(' ').map(n => n[0]).join('')}
+                    </div>
                     <div className="flex-1">
                       <div className="flex items-center justify-between">
                         <button 
@@ -245,20 +233,11 @@ const Index = () => {
             <h2 className="text-2xl font-bold text-slate-800">
               {tabTitles[activeTab as keyof typeof tabTitles]}
             </h2>
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700">
-                  <Plus className="mr-2 h-4 w-4" />
-                  Create Task
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-md">
-                <DialogHeader>
-                  <DialogTitle>Create New Task</DialogTitle>
-                </DialogHeader>
-                <TaskForm onSubmit={handleAddTask} employees={employees} />
-              </DialogContent>
-            </Dialog>
+            <TaskForm 
+              onSubmit={handleAddTask} 
+              employees={employees}
+              onClose={() => {}}
+            />
           </div>
 
           <div className="grid gap-4">
@@ -266,7 +245,9 @@ const Index = () => {
               <TaskCard 
                 key={task.id} 
                 task={task} 
-                onUpdate={(updates) => handleTaskUpdate(task.id, updates)}
+                employees={employees}
+                onUpdate={handleTaskUpdate}
+                onDelete={handleTaskDelete}
               />
             ))}
             {filteredTasks.length === 0 && (
@@ -344,7 +325,7 @@ const Index = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-green-100 text-sm">Completed</p>
-                  <p className="text-3xl font-bold">{tasks.filter(t => t.status === 'completed').length}</p>
+                  <p className="text-3xl font-bold">{tasks.filter(t => !!t.actualEndDate).length}</p>
                   <p className="text-green-100 text-xs mt-1">+8% completion rate</p>
                 </div>
                 <CheckCircle className="h-12 w-12 text-green-200" />
@@ -357,7 +338,7 @@ const Index = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-orange-100 text-sm">In Progress</p>
-                  <p className="text-3xl font-bold">{tasks.filter(t => t.status === 'in-progress').length}</p>
+                  <p className="text-3xl font-bold">{tasks.filter(t => !t.actualEndDate).length}</p>
                   <p className="text-orange-100 text-xs mt-1">Active workload</p>
                 </div>
                 <Clock className="h-12 w-12 text-orange-200" />
@@ -389,35 +370,28 @@ const Index = () => {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Dialog>
-                <DialogTrigger asChild>
+              <TaskForm 
+                onSubmit={handleAddTask} 
+                employees={employees}
+                onClose={() => {}}
+                triggerButton={
                   <Button className="h-16 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700">
                     <Plus className="mr-2 h-5 w-5" />
                     Create New Task
                   </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-md">
-                  <DialogHeader>
-                    <DialogTitle>Create New Task</DialogTitle>
-                  </DialogHeader>
-                  <TaskForm onSubmit={handleAddTask} employees={employees} />
-                </DialogContent>
-              </Dialog>
+                }
+              />
 
-              <Dialog>
-                <DialogTrigger asChild>
+              <EmployeeForm 
+                onSubmit={handleAddEmployee}
+                onClose={() => {}}
+                triggerButton={
                   <Button variant="outline" className="h-16 hover:bg-purple-50">
                     <Users className="mr-2 h-5 w-5" />
                     Add Employee
                   </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-md">
-                  <DialogHeader>
-                    <DialogTitle>Add New Employee</DialogTitle>
-                  </DialogHeader>
-                  <EmployeeForm onSubmit={handleAddEmployee} />
-                </DialogContent>
-              </Dialog>
+                }
+              />
 
               <Button 
                 variant="outline" 
@@ -454,22 +428,18 @@ const Index = () => {
                 <div key={task.id} className="flex items-center justify-between p-4 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">
                   <div className="flex items-center space-x-3">
                     <div className={`w-3 h-3 rounded-full ${
-                      task.status === 'completed' ? 'bg-green-500' :
-                      task.status === 'in-progress' ? 'bg-blue-500' : 'bg-slate-400'
+                      task.actualEndDate ? 'bg-green-500' : 'bg-blue-500'
                     }`} />
                     <div>
-                      <h4 className="font-medium text-slate-800">{task.title}</h4>
-                      <p className="text-sm text-slate-500">Assigned to {task.assignedTo}</p>
+                      <h4 className="font-medium text-slate-800">{task.taskName}</h4>
+                      <p className="text-sm text-slate-500">Assigned to {task.employeeName}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Badge variant={
-                      task.priority === 'high' ? 'destructive' :
-                      task.priority === 'medium' ? 'default' : 'secondary'
-                    }>
-                      {task.priority}
+                    <Badge variant="secondary">
+                      {task.category}
                     </Badge>
-                    <span className="text-sm text-slate-500">{task.dueDate}</span>
+                    <span className="text-sm text-slate-500">{task.estimatedEndDate}</span>
                   </div>
                 </div>
               ))}

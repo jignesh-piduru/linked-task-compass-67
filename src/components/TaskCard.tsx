@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -110,7 +111,7 @@ const TaskCard = ({ task, employees, onUpdate, onDelete }: TaskCardProps) => {
           </div>
 
           {/* Tool Links */}
-          {task.toolLinks.length > 0 && (
+          {task.toolLinks && task.toolLinks.length > 0 && (
             <div>
               <h4 className="text-sm font-medium text-slate-700 mb-2 flex items-center gap-1">
                 <Link className="h-4 w-4" />
