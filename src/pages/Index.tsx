@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -337,7 +338,7 @@ const Index = () => {
               </Button>
             </div>
             <div className="p-6">
-              <TaskForm onSubmit={handleAddTask} employees={employees} />
+              <TaskForm onSubmit={handleAddTask} employees={employees} onClose={() => setShowTaskForm(false)} />
             </div>
           </div>
           {renderMainContent()}
@@ -358,7 +359,7 @@ const Index = () => {
               </Button>
             </div>
             <div className="p-6">
-              <EmployeeForm onSubmit={handleAddEmployee} />
+              <EmployeeForm onSubmit={handleAddEmployee} onClose={() => setShowEmployeeForm(false)} />
             </div>
           </div>
           {renderMainContent()}
