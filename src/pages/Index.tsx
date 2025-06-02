@@ -368,7 +368,12 @@ const Index = () => {
     
     switch (activeTab) {
       case 'tasks-today':
-        return tasks.filter(task => task.estimatedEndDate === today);
+        // Show tasks that start today OR are due today OR are currently active and not completed
+        return tasks.filter(task => 
+          task.startDate === today || 
+          task.estimatedEndDate === today ||
+          (task.startDate <= today && task.estimatedEndDate >= today && !task.actualEndDate)
+        );
       case 'tasks-completed':
         return tasks.filter(task => !!task.actualEndDate);
       case 'tasks-future':
@@ -747,23 +752,36 @@ const Index = () => {
             </Dialog>
           </div>
 
-          <TasksTable 
-            tasks={filteredTasks}
-            employees={employees}
-            onUpdate={handleTaskUpdate}
-            onDelete={handleTaskDelete}
-          />
-          
-          {filteredTasks.length === 0 && (
+          {filteredTasks.length > 0 ? (
+            <TasksTable 
+              tasks={filteredTasks}
+              employees={employees}
+              onUpdate={handleTaskUpdate}
+              onDelete={handleTaskDelete}
+            />
+          ) : (
             <Card className="p-8 text-center">
-              <p className="text-slate-500">No tasks found for this category.</p>
-              <Button 
-                onClick={() => setShowTaskDialog(true)}
-                className="mt-4 bg-blue-600 hover:bg-blue-700 text-white"
-              >
-                <Plus className="mr-2 h-4 w-4" />
-                Create Your First Task
-              </Button>
+              <div className="flex flex-col items-center space-y-4">
+                <Calendar className="h-12 w-12 text-gray-400" />
+                <div>
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">
+                    {activeTab === 'tasks-today' ? 'No tasks scheduled for today' : 'No tasks found'}
+                  </h3>
+                  <p className="text-gray-500 mb-4">
+                    {activeTab === 'tasks-today' 
+                      ? "You don't have any tasks starting, due, or active today. Great job staying on top of your work!"
+                      : `No tasks found for this category.`
+                    }
+                  </p>
+                </div>
+                <Button 
+                  onClick={() => setShowTaskDialog(true)}
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  <Plus className="mr-2 h-4 w-4" />
+                  {activeTab === 'tasks-today' ? 'Schedule a Task for Today' : 'Create Your First Task'}
+                </Button>
+              </div>
             </Card>
           )}
         </div>
