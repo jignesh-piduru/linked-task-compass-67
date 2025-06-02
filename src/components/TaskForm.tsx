@@ -1,14 +1,22 @@
+
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { X } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { Task } from '@/types/Task';
 import { Employee } from '@/types/Employee';
 import ToolLinkManager from './ToolLinkManager';
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 
 interface TaskFormProps {
   task?: Task;
@@ -18,6 +26,7 @@ interface TaskFormProps {
 }
 
 const TaskForm = ({ task, employees, onSubmit, onClose }: TaskFormProps) => {
+  const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState({
     employeeName: task?.employeeName || '',
     taskName: task?.taskName || '',
@@ -32,147 +41,155 @@ const TaskForm = ({ task, employees, onSubmit, onClose }: TaskFormProps) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit(formData);
+    setOpen(false);
+    onClose();
   };
 
   const handleInputChange = (field: string, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
+  const handleOpenChange = (newOpen: boolean) => {
+    setOpen(newOpen);
+    if (!newOpen) {
+      onClose();
+    }
+  };
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-          <CardTitle className="text-xl font-semibold">
+    <Sheet open={open} onOpenChange={handleOpenChange}>
+      <SheetTrigger asChild>
+        <Button className="h-16 hover:bg-blue-50">
+          <Plus className="mr-2 h-5 w-5" />
+          Add Task
+        </Button>
+      </SheetTrigger>
+      <SheetContent className="w-[400px] sm:w-[540px] overflow-y-auto">
+        <SheetHeader>
+          <SheetTitle>
             {task ? 'Edit Task' : 'Create New Task'}
-          </CardTitle>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onClose}
-            className="h-8 w-8 p-0"
-          >
-            <X className="h-4 w-4" />
-          </Button>
-        </CardHeader>
+          </SheetTitle>
+          <SheetDescription>
+            {task ? 'Update task information' : 'Create a new task for your team'}
+          </SheetDescription>
+        </SheetHeader>
 
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="employeeName">Employee</Label>
-                <Select value={formData.employeeName} onValueChange={(value) => handleInputChange('employeeName', value)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select employee" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {employees.map((employee) => (
-                      <SelectItem key={employee.id} value={employee.name}>
-                        {employee.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="taskName">Task Name</Label>
-                <Input
-                  id="taskName"
-                  value={formData.taskName}
-                  onChange={(e) => handleInputChange('taskName', e.target.value)}
-                  required
-                  placeholder="Enter task name"
-                />
-              </div>
-            </div>
-
+        <form onSubmit={handleSubmit} className="space-y-4 mt-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="category">Category</Label>
-              <Select value={formData.category} onValueChange={(value) => handleInputChange('category', value)}>
+              <Label htmlFor="employeeName">Employee</Label>
+              <Select value={formData.employeeName} onValueChange={(value) => handleInputChange('employeeName', value)}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select category" />
+                  <SelectValue placeholder="Select employee" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Product">Product</SelectItem>
-                  <SelectItem value="R&D">R&D</SelectItem>
+                  {employees.map((employee) => (
+                    <SelectItem key={employee.id} value={employee.name}>
+                      {employee.name}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="description">Description</Label>
-              <Textarea
-                id="description"
-                value={formData.description}
-                onChange={(e) => handleInputChange('description', e.target.value)}
+              <Label htmlFor="taskName">Task Name</Label>
+              <Input
+                id="taskName"
+                value={formData.taskName}
+                onChange={(e) => handleInputChange('taskName', e.target.value)}
                 required
-                placeholder="Enter task description"
-                rows={3}
+                placeholder="Enter task name"
               />
             </div>
+          </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="startDate">Start Date</Label>
-                <Input
-                  id="startDate"
-                  type="date"
-                  value={formData.startDate}
-                  onChange={(e) => handleInputChange('startDate', e.target.value)}
-                  required
-                />
-              </div>
+          <div className="space-y-2">
+            <Label htmlFor="category">Category</Label>
+            <Select value={formData.category} onValueChange={(value) => handleInputChange('category', value)}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select category" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Product">Product</SelectItem>
+                <SelectItem value="R&D">R&D</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="estimatedEndDate">Estimated End Date</Label>
-                <Input
-                  id="estimatedEndDate"
-                  type="date"
-                  value={formData.estimatedEndDate}
-                  onChange={(e) => handleInputChange('estimatedEndDate', e.target.value)}
-                  required
-                />
-              </div>
+          <div className="space-y-2">
+            <Label htmlFor="description">Description</Label>
+            <Textarea
+              id="description"
+              value={formData.description}
+              onChange={(e) => handleInputChange('description', e.target.value)}
+              required
+              placeholder="Enter task description"
+              rows={3}
+            />
+          </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="actualEndDate">Actual End Date</Label>
-                <Input
-                  id="actualEndDate"
-                  type="date"
-                  value={formData.actualEndDate}
-                  onChange={(e) => handleInputChange('actualEndDate', e.target.value)}
-                />
-              </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="startDate">Start Date</Label>
+              <Input
+                id="startDate"
+                type="date"
+                value={formData.startDate}
+                onChange={(e) => handleInputChange('startDate', e.target.value)}
+                required
+              />
             </div>
 
             <div className="space-y-2">
-              <Label>Tool Links</Label>
-              <ToolLinkManager
-                toolLinks={formData.toolLinks}
-                onChange={(toolLinks) => handleInputChange('toolLinks', toolLinks)}
+              <Label htmlFor="estimatedEndDate">Estimated End Date</Label>
+              <Input
+                id="estimatedEndDate"
+                type="date"
+                value={formData.estimatedEndDate}
+                onChange={(e) => handleInputChange('estimatedEndDate', e.target.value)}
+                required
               />
             </div>
 
-            <div className="flex gap-3 pt-4">
-              <Button
-                type="submit"
-                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
-              >
-                {task ? 'Update Task' : 'Create Task'}
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={onClose}
-                className="flex-1"
-              >
-                Cancel
-              </Button>
+            <div className="space-y-2">
+              <Label htmlFor="actualEndDate">Actual End Date</Label>
+              <Input
+                id="actualEndDate"
+                type="date"
+                value={formData.actualEndDate}
+                onChange={(e) => handleInputChange('actualEndDate', e.target.value)}
+              />
             </div>
-          </form>
-        </CardContent>
-      </Card>
-    </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Tool Links</Label>
+            <ToolLinkManager
+              toolLinks={formData.toolLinks}
+              onChange={(toolLinks) => handleInputChange('toolLinks', toolLinks)}
+            />
+          </div>
+
+          <div className="flex gap-3 pt-4">
+            <Button
+              type="submit"
+              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              {task ? 'Update Task' : 'Create Task'}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setOpen(false)}
+              className="flex-1"
+            >
+              Cancel
+            </Button>
+          </div>
+        </form>
+      </SheetContent>
+    </Sheet>
   );
 };
 
