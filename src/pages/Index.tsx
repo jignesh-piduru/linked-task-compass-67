@@ -1,6 +1,6 @@
+
 import { useState } from 'react';
 import Sidebar from '@/components/Sidebar';
-import TaskGrid from '@/components/TaskGrid';
 import TaskDetails from '@/components/TaskDetails';
 import TaskForm from '@/components/TaskForm';
 import EmployeeForm from '@/components/EmployeeForm';
@@ -77,6 +77,45 @@ const Index = () => {
       skills: ['Digital Marketing', 'Analytics', 'Content Strategy']
     }
   ]);
+
+  // Map sidebar tabs to view states
+  const handleTabChange = (tab: string) => {
+    switch (tab) {
+      case 'tasks-today':
+        setCurrentView('today');
+        break;
+      case 'tasks-all':
+        setCurrentView('all');
+        break;
+      case 'tasks-completed':
+        setCurrentView('completed');
+        break;
+      case 'tasks-future':
+        setCurrentView('future');
+        break;
+      default:
+        setCurrentView('today');
+    }
+    setSelectedTask(null);
+    setShowTaskForm(false);
+    setShowEmployeeForm(false);
+  };
+
+  // Map current view to sidebar tab
+  const getCurrentTab = () => {
+    switch (currentView) {
+      case 'today':
+        return 'tasks-today';
+      case 'all':
+        return 'tasks-all';
+      case 'completed':
+        return 'tasks-completed';
+      case 'future':
+        return 'tasks-future';
+      default:
+        return 'tasks-today';
+    }
+  };
 
   const getTodaysTasks = () => {
     const today = new Date().toISOString().split('T')[0];
@@ -168,7 +207,7 @@ const Index = () => {
               ← Back to Tasks
             </Button>
           </div>
-          <TaskDetails task={selectedTask} onClose={() => setSelectedTask(null)} />
+          <TaskDetails task={selectedTask} />
         </div>
       );
     }
@@ -206,7 +245,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       <div className="flex">
-        <Sidebar />
+        <Sidebar activeTab={getCurrentTab()} onTabChange={handleTabChange} />
         
         <div className="flex-1 ml-64">
           <div className="p-8">
